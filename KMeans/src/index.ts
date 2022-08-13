@@ -14,3 +14,5 @@ const kmeans = new KMeans(testArray);
 // 3. init centroids
 kmeans.setCentroids(1);
 console.log(kmeans.centroids);
+
+// 4. iteration pattern next

@@ -3,7 +3,11 @@ import _ from "lodash";
 class KMeans {
   datas: number[][];
   K: number;
+
+  // run datas
+  labels?: number[];
   centroids?: number[][];
+  done?: boolean;
 
   constructor(datas: number[][]) {
     this.datas = datas;
@@ -19,7 +23,11 @@ class KMeans {
       this.datas,
       (v, i) => _.indexOf(centroidIdxes, i) !== -1
     );
+    this.done = false;
+    this.labels = _.fill(new Array(this.datas.length), 0);
   }
+
+  next() {}
 }
 
 export default KMeans;

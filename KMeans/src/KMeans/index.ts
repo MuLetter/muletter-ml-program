@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { euclideanDistance, getMinLabel } from "./utils";
 
 class KMeans {
   datas: number[][];
@@ -27,7 +28,22 @@ class KMeans {
     this.labels = _.fill(new Array(this.datas.length), 0);
   }
 
-  next() {}
+  next() {
+    this.labels = _.map(this.datas, (x) =>
+      getMinLabel(
+        _.map(this.centroids, (centroid) => euclideanDistance(x, centroid))
+      )
+    );
+
+    const newCentroids = new Array(this.K);
+    for (let label of _.uniq(this.labels)) {
+      const members = _.filter(this.datas, (d, i) => this.labels![i] === label);
+      const zipDatas = _.zip.apply(null, members);
+
+      newCentroids[label] = _.map(zipDatas, (z) => _.mean(z));
+    }
+    this.centroids = newCentroids;
+  }
 }
 
 export default KMeans;

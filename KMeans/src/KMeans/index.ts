@@ -9,10 +9,12 @@ class KMeans {
   labels?: number[];
   centroids?: number[][];
   done?: boolean;
+  earlyStop: number;
 
-  constructor(datas: number[][]) {
+  constructor(datas: number[][], earlyStop = 3) {
     this.datas = datas;
     this.K = Math.round(Math.sqrt(datas.length / 2));
+    this.earlyStop = earlyStop;
   }
 
   setCentroids(version: number) {
@@ -42,7 +44,11 @@ class KMeans {
 
       newCentroids[label] = _.map(zipDatas, (z) => _.mean(z));
     }
+
+    if (_.isEqual(this.centroids, newCentroids)) this.earlyStop--;
     this.centroids = newCentroids;
+
+    if (this.earlyStop === 0) this.done = true;
   }
 }
 

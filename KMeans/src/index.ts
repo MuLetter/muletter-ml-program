@@ -17,12 +17,10 @@ kmeans.setCentroids(1);
 console.log(kmeans.centroids);
 
 // 4. iteration pattern next
-console.log(kmeans.labels);
 
 // 1 round
-kmeans.next();
-console.log(kmeans.centroids);
 
-// 2 round
-kmeans.next();
-console.log(kmeans.centroids);
+do {
+  kmeans.next();
+  console.log(kmeans.labels);
+} while (!kmeans.done);

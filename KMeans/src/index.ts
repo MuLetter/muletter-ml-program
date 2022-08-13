@@ -10,3 +10,7 @@ const testArray = _.map(new Array(TESTSIZE), () => [
 
 // 2. kmeans init
 const kmeans = new KMeans(testArray);
+
+// 3. init centroids
+kmeans.setCentroids(1);
+console.log(kmeans.centroids);

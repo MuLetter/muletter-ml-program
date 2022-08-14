@@ -1,4 +1,5 @@
 import _ from "lodash";
+import KMeans from "./KMeans";
 import MinMaxScaler from "./MinMaxScaler";
 
 // 1. data setting
@@ -7,9 +8,15 @@ const testArray = _.map(new Array(TESTSIZE), () => [
   Math.floor(Math.random() * 100) + 1,
   Math.floor(Math.random() * 100) + 1,
 ]);
-console.log(testArray);
 
-const scaler = new MinMaxScaler(testArray);
-scaler.fit();
+// 2. min - max scaling
+const datas = new MinMaxScaler(testArray).fit().transfrom();
+const kmeans = new KMeans(datas);
 
-console.log(scaler.transfrom(testArray));
+kmeans.setCentroids(2);
+do {
+  console.log(kmeans.ecv);
+  kmeans.next();
+} while (!kmeans.done);
+
+console.log(kmeans.labels);

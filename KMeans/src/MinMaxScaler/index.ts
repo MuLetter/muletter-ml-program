@@ -18,10 +18,14 @@ class MinMaxScaler {
     this.min = _.map(zipDatas, (zipData) => _.min(zipData));
     this.max = _.map(zipDatas, (zipData) => _.max(zipData));
     this.minMaxSubtract = arraySubtract(this.max, this.min);
+
+    return this;
   }
 
-  transfrom(datas: number[][]) {
+  transfrom(datas?: number[][]) {
     if (!this.minMaxSubtract) throw new Error("Pleash fit execute.");
+    if (!datas) datas = this.datas;
+
     return _.map(datas, (X) =>
       arrayDivide(arraySubtract(X, this.min!), this.minMaxSubtract!)
     );

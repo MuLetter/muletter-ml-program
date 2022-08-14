@@ -11,8 +11,9 @@ const testArray = _.map(new Array(TESTSIZE), () => [
 
 // 2. min - max scaling
 const datas = new MinMaxScaler(testArray).fit().transfrom();
-const kmeans = new KMeans(datas);
 
+// 3. kmeans run
+const kmeans = new KMeans(datas);
 kmeans.setCentroids(2);
 do {
   console.log(kmeans.ecv);

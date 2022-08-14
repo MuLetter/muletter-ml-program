@@ -6,12 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-        .wrap {
+        #wrap {
             display: flex;
-            flex-direction: column;
-
-            width: 500px;
-            height: 540px;
+            flex-direction: row;
+            column-gap: 48px;
 
             position: absolute;
             top: 0;
@@ -19,8 +17,18 @@
             bottom: 0;
             left: 0;
             margin: auto;
+
+            width: 1048px;
+            height: 540px;
         }
-        kmeans-scatter {
+        .container {
+            display: flex;
+            flex-direction: column;
+
+            width: 500px;
+            height: 540px;
+        }
+        .scatter {
             width: 500px;
             height: 500px;
 
@@ -37,15 +45,26 @@
     </style>
 </head>
 <body>
-    <div class="wrap">
-        <svg id="kmeans-scatter" viewBox="0 0 100 100">
-        </svg>
-        <div class="buttons">
-            <button class="prev">prev</button>
-            <button class="init">init</button>
-            <button class="next">next</button>
+    <div id="wrap">
+        <div class="kmeans container">
+            <svg class="scatter kmeans" viewBox="0 0 100 100">
+            </svg>
+            <div class="buttons">
+                <button class="prev">prev</button>
+                <button class="init">init</button>
+                <button class="next">next</button>
+            </div>
+        </div>
+        <div class="kmeans-plus container">
+            <svg class="scatter kmeans-plus" viewBox="0 0 100 100">
+            </svg>
+            <div class="buttons">
+                <button class="prev">prev</button>
+                <button class="init">init</button>
+                <button class="next">next</button>
+            </div>
         </div>
     </div>
-    <script src="./src/KMeansExample.ts" type="module"></script>
+    <script src="./src/IntegratedWebTest.ts" type="module"></script>
 </body>
 </html>

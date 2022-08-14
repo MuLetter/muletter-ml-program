@@ -1,5 +1,10 @@
 import _ from "lodash";
-import { arrayDivide, arraySubtract } from "./calculator";
+import {
+  arrayDivide,
+  arrayMultiply,
+  arraySubtract,
+  arraySum,
+} from "./calculator";
 
 class MinMaxScaler {
   datas: number[][];
@@ -28,6 +33,12 @@ class MinMaxScaler {
 
     return _.map(datas, (X) =>
       arrayDivide(arraySubtract(X, this.min!), this.minMaxSubtract!)
+    );
+  }
+
+  reverseTransform(datas: number[][]) {
+    return _.map(datas, (X) =>
+      arraySum(arrayMultiply(X, this.minMaxSubtract!), this.min!)
     );
   }
 }

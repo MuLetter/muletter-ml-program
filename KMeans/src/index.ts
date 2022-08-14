@@ -10,7 +10,11 @@ const testArray = _.map(new Array(TESTSIZE), () => [
 ]);
 
 // 2. min - max scaling
-const datas = new MinMaxScaler(testArray).fit().transfrom();
+const scaler = new MinMaxScaler(testArray).fit();
+const datas = scaler.transfrom();
+console.log(testArray);
+console.log(datas);
+console.log(scaler.reverseTransform(datas));
 
 // 3. kmeans run
 const kmeans = new KMeans(datas);

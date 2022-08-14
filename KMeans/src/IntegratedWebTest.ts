@@ -5,6 +5,7 @@ import _ from "lodash";
 const TESTSIZE = 50;
 let kmeans: KMeans, kmeansplus: KMeans;
 let testDatas: number[][];
+let scaler: MinMaxScaler;
 
 function setEvent() {
   document.querySelectorAll(".init").forEach((initBtn) => {
@@ -34,7 +35,7 @@ function init() {
     Math.floor(Math.random() * 100) + 1,
     Math.floor(Math.random() * 100) + 1,
   ]);
-  const scaler = new MinMaxScaler(testDatas);
+  scaler = new MinMaxScaler(testDatas);
   const datas = scaler.fit().transfrom();
 
   kmeans = new KMeans(datas);
@@ -75,12 +76,13 @@ function render() {
         circle.setAttribute("cx", member[0].toString());
         circle.setAttribute("cy", member[1].toString());
         circle.setAttribute("r", "2");
-        circle.setAttribute("fill", "#" + kmeans.colors[label]);
+        circle.setAttribute("fill", "#" + _kmeans.colors[label]);
 
         elScatter.appendChild(circle);
       });
 
-      _kmeans!.centroids?.forEach((centroid) => {
+      const _centroids = scaler.reverseTransform(_kmeans!.centroids!);
+      _centroids.forEach((centroid) => {
         const circle = document.createElementNS(
           "http://www.w3.org/2000/svg",
           "circle"
@@ -88,7 +90,7 @@ function render() {
         circle.setAttribute("cx", centroid[0].toString());
         circle.setAttribute("cy", centroid[1].toString());
         circle.setAttribute("r", "2");
-        circle.setAttribute("fill", "#" + "000");
+        circle.setAttribute("fill", "#" + "F00");
 
         elScatter.appendChild(circle);
       });

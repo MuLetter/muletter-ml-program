@@ -22,3 +22,21 @@ export function getMinLabel(numbers: number[]) {
 
   return label;
 }
+
+export function getMaxLabel(numbers: number[]) {
+  let label = 0;
+  let maxValue = numbers[0];
+
+  for (let i = 1; i < numbers.length; i++) {
+    if (maxValue < numbers[i]) {
+      label = i;
+      maxValue = numbers[i];
+    }
+  }
+
+  return label;
+}
+
+export function getDistancePropotinal(X: number[][], Y: number[][]) {
+  return _.map(X, (x) => _.min(_.map(Y, (y) => euclideanDistance(x, y))));
+}

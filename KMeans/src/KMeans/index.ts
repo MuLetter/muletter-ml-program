@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { v1, v2 } from "./setCentroids";
 import { euclideanDistance, getMinLabel } from "./utils";
 
 class KMeans {
@@ -10,6 +11,7 @@ class KMeans {
   labels?: number[];
   centroids?: number[][];
   done?: boolean;
+  algType?: string;
   earlyStop: number;
 
   constructor(datas: number[][], earlyStop = 3) {
@@ -32,14 +34,22 @@ class KMeans {
   setCentroids(version: number) {
     // version 1. KMeans
     // version 2. KMeans++
-    const idxes = _.range(0, this.datas.length);
-    const centroidIdxes = _.sampleSize(idxes, this.K);
-    this.centroids = _.filter(
-      this.datas,
-      (v, i) => _.indexOf(centroidIdxes, i) !== -1
-    );
-    this.done = false;
-    this.labels = _.fill(new Array(this.datas.length), 0);
+    const minVersion = 1;
+    const maxVersion = 2;
+    switch (version) {
+      case 1:
+        this.algType = "KMeans";
+        v1.call(this);
+        break;
+      case 2:
+        this.algType = "KMeans++";
+        v2.call(this);
+        break;
+      default:
+        throw new Error(
+          `Version.${version} not suported. Min Version.${minVersion}, Max Version.${maxVersion}`
+        );
+    }
   }
 
   next() {

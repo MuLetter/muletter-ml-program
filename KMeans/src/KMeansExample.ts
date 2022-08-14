@@ -30,7 +30,7 @@ do {
 
 // DOM Test
 function render() {
-  const elSVG = document.getElementById("scatter");
+  const elSVG = document.getElementById("kmeans-scatter");
   const circles = document.querySelectorAll("circle");
   circles.forEach((circle) => {
     circle.remove();

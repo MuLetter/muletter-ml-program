@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { clusterSeparation } from "./calculator";
 import { v1, v2 } from "./setCentroids";
 import { euclideanDistance, getMinLabel } from "./utils";
 
@@ -71,6 +72,10 @@ class KMeans {
     this.centroids = newCentroids;
 
     if (this.earlyStop === 0) this.done = true;
+  }
+
+  get clusterSeparation() {
+    return clusterSeparation.call(this);
   }
 }
 

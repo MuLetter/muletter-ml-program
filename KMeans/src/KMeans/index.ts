@@ -5,8 +5,9 @@ import { euclideanDistance, getMinLabel } from "./utils";
 
 class KMeans {
   datas: number[][];
-  colors: string[];
   K: number;
+
+  colors?: string[];
 
   // run datas
   labels?: number[];
@@ -19,17 +20,6 @@ class KMeans {
     this.datas = datas;
     this.K = Math.round(Math.sqrt(datas.length / 2));
     this.earlyStop = earlyStop;
-
-    const colors: string[] = [];
-    for (let i = 0; i < this.K; i++) {
-      let color = Math.floor(Math.random() * 16777215).toString(16);
-      while (color in colors) {
-        color = Math.floor(Math.random() * 16777215).toString(16);
-        console.log(color in colors);
-      }
-      colors.push(color);
-    }
-    this.colors = colors;
   }
 
   setCentroids(version: number) {
@@ -39,11 +29,11 @@ class KMeans {
     const maxVersion = 2;
     switch (version) {
       case 1:
-        this.algType = "KMeans";
+        this.algType = "kmeans";
         v1.call(this);
         break;
       case 2:
-        this.algType = "KMeans++";
+        this.algType = "kmeans-plus";
         v2.call(this);
         break;
       default:

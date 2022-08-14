@@ -1,6 +1,7 @@
 import KMeans from "./KMeans";
 import MinMaxScaler from "./MinMaxScaler";
 import _ from "lodash";
+import { generateRandomColor } from "./KMeans/utils/styles";
 
 const TESTSIZE = 50;
 let kmeans: KMeans, kmeansplus: KMeans;
@@ -24,6 +25,10 @@ function setEvent() {
     else if (cont!.classList.contains("kmeans-plus")) _kmeans = kmeansplus;
 
     nextBtn.addEventListener("click", () => {
+      if (_kmeans!.done) {
+        alert("마무리 된 작업입니다.");
+        return;
+      }
       _kmeans!.next();
       render();
     });
@@ -43,6 +48,10 @@ function init() {
 
   kmeansplus = new KMeans(datas);
   kmeansplus.setCentroids(2);
+
+  const colors = generateRandomColor(kmeans.K);
+  kmeans.colors = colors;
+  kmeansplus.colors = colors;
 
   setEvent();
 }
@@ -76,13 +85,13 @@ function render() {
         circle.setAttribute("cx", member[0].toString());
         circle.setAttribute("cy", member[1].toString());
         circle.setAttribute("r", "2");
-        circle.setAttribute("fill", "#" + _kmeans.colors[label]);
+        circle.setAttribute("fill", "#" + _kmeans.colors![label]);
 
         elScatter.appendChild(circle);
       });
 
       const _centroids = scaler.reverseTransform(_kmeans!.centroids!);
-      _centroids.forEach((centroid) => {
+      _centroids.forEach((centroid, label) => {
         const circle = document.createElementNS(
           "http://www.w3.org/2000/svg",
           "circle"
@@ -90,11 +99,14 @@ function render() {
         circle.setAttribute("cx", centroid[0].toString());
         circle.setAttribute("cy", centroid[1].toString());
         circle.setAttribute("r", "2");
-        circle.setAttribute("fill", "#" + "F00");
+        circle.setAttribute("fill", "#" + _kmeans.colors![label]);
 
         elScatter.appendChild(circle);
       });
     }
+
+    const ecvParagraph = document.querySelector(`div.${_kmeans!.algType} > p`);
+    if (ecvParagraph) ecvParagraph.textContent = _kmeans!.ecv.toString();
   }
 }
 

@@ -3,7 +3,7 @@ import MinMaxScaler from "./MinMaxScaler";
 import _ from "lodash";
 import { generateRandomColor } from "./KMeans/utils/styles";
 
-const TESTSIZE = 50;
+const TESTSIZE = 5000;
 let kmeans: KMeans, kmeansplus: KMeans;
 let testDatas: number[][];
 let scaler: MinMaxScaler;

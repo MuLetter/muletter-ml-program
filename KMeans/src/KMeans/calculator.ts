@@ -11,3 +11,13 @@ export function clusterSeparation(this: KMeans) {
 
   return _.mean(_.flatten(separations));
 }
+
+export function sumOfSqaured(datas: number[][]) {
+  const dataMean = _.map(_.unzip(datas), (zipData) => _.mean(zipData));
+  const dataMeanDistances = _.map(
+    datas,
+    (data) => euclideanDistance(dataMean, data) ** 2
+  );
+
+  return _.sum(dataMeanDistances);
+}

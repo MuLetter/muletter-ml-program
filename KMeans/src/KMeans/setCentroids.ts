@@ -9,8 +9,6 @@ export function v1(this: KMeans) {
     this.datas,
     (v, i) => _.indexOf(centroidIdxes, i) !== -1
   );
-  this.done = false;
-  this.labels = _.fill(new Array(this.datas.length), 0);
 }
 
 export function v2(this: KMeans) {

@@ -20,17 +20,18 @@ const kmeans = new KMeans(testArray);
 // 3. kmeans++ set centroids
 // kmeans.setCentroids(1);
 // console.log(kmeans.clusterSeparation, kmeans.centroids);
-
 kmeans.setCentroids(2);
 console.log(kmeans.clusterSeparation, kmeans.centroids);
+// kmeans.next();
+// // 4. tss
+// console.log(kmeans.tss);
 
-// 4. tss
-const dataMean = _.map(_.unzip(kmeans.datas), (zipData) => _.mean(zipData));
-const dataMeanDistances = _.map(
-  kmeans.datas,
-  (data) => euclideanDistance(dataMean, data) ** 2
-);
-const dataMeanDistance = _.sum(dataMeanDistances);
-console.log(dataMeanDistance);
+// // 5. wss
+// console.log(kmeans.wss);
 
-// 5. wss
+// // 6. ecv
+// console.log(kmeans.ecv);
+do {
+  console.log(kmeans.ecv);
+  kmeans.next();
+} while (!kmeans.done);

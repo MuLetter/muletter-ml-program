@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { clusterSeparation } from "./calculator";
+import { clusterSeparation, sumOfSqaured } from "./calculator";
 import { v1, v2 } from "./setCentroids";
 import { euclideanDistance, getMinLabel } from "./utils";
 
@@ -51,6 +51,9 @@ class KMeans {
           `Version.${version} not suported. Min Version.${minVersion}, Max Version.${maxVersion}`
         );
     }
+
+    this.done = false;
+    this.labels = _.fill(new Array(this.datas.length), 0);
   }
 
   next() {
@@ -76,6 +79,27 @@ class KMeans {
 
   get clusterSeparation() {
     return clusterSeparation.call(this);
+  }
+
+  get tss() {
+    return sumOfSqaured(this.datas);
+  }
+  get wss() {
+    let wss = 0;
+    for (let label of _.uniq(this.labels)) {
+      const filtered = _.filter(
+        this.datas,
+        (data, idx) => this.labels![idx] === label
+      );
+      const sse = sumOfSqaured(filtered);
+      wss += sse;
+    }
+
+    return wss;
+  }
+
+  get ecv() {
+    return (1 - this.wss / this.tss) * 100;
   }
 }
 

@@ -1,3 +1,18 @@
+export type Seed = {
+  [key: string]: string | number;
+  seed_tracks: string;
+  seed_artists: string;
+  seed_genres: string;
+  seed_danceability: number;
+  seed_energy: number;
+  seed_loudness: number;
+  seed_speechiness: number;
+  seed_acousticness: number;
+  seed_liveness: number;
+  seed_valence: number;
+  seed_tempo: number;
+};
+
 export type NeedAudioFeautres =
   | "id"
   | "danceability"

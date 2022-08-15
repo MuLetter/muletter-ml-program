@@ -24,6 +24,11 @@ class RecommenderBuilder {
     await this.recommender.addAudioFeatures();
   }
 
+  // 4. set seed and recommend API Call
+  async step4() {
+    this.recommender.addSeeds();
+  }
+
   get() {
     return this.recommender;
   }

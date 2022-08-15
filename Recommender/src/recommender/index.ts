@@ -3,7 +3,7 @@ import { dbConnect, dbDisconnect } from "@models/connect";
 import { MailBoxModel } from "@models/MailBox";
 import { MailBox } from "@models/types";
 import dotenv from "dotenv";
-import { ArtistAndGenres, ProcessAudioFeatures } from "./types";
+import { ArtistAndGenres, ProcessAudioFeatures, Seed } from "./types";
 import _ from "lodash";
 import { parseNeedFeatures, partition } from "./utils";
 
@@ -14,6 +14,7 @@ class Recommender {
   availableGenres?: string[];
   artistAndGenres?: ArtistAndGenres[];
   audioFeatures?: ProcessAudioFeatures[];
+  seeds?: Seed[];
 
   constructor() {
     dotenv.config();
@@ -123,6 +124,38 @@ class Recommender {
     } catch (err) {
       console.error(err);
     }
+  }
+
+  async addSeeds() {
+    const tracks = this.mailBox?.tracks;
+    const artists = this.artistAndGenres;
+    const features = this.audioFeatures;
+
+    this.seeds = _.map(tracks, (track) => {
+      const artist = _.find(artists, (artist) => artist.id === track.artistIds);
+      const feature = _.find(
+        features,
+        (feature) => feature.id === track.trackId
+      );
+      const seedFeatures = _.reduce(
+        Object.keys(feature!),
+        (acc, cur) =>
+          cur === "id"
+            ? acc
+            : {
+                ...acc,
+                [`seed_${cur}`]: feature![cur],
+              },
+        {}
+      );
+
+      return {
+        seed_tracks: track.trackId,
+        seed_artists: artist?.id,
+        seed_genres: artist?.genres.join(","),
+        ...seedFeatures,
+      };
+    }) as any;
   }
 }
 

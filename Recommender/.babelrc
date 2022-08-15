@@ -1,0 +1,17 @@
+{
+    "plugins": [
+      [
+        "module-resolver",
+        {
+          "root": ["./src"],
+          "alias": {
+            "@recommender": "./src/recommender",
+            "@api": "./src/api",
+            "@kmeans": "./src/KMeans",
+            "@minmax-scaler": "./src/MinMaxScaler",
+            "@models": "./src/models"
+          }
+        }
+      ]
+    ]
+}

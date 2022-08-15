@@ -43,3 +43,5 @@ yarn.lock
 dist
 
 .parcel-cache
+
+.env

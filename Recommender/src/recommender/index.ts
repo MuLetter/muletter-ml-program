@@ -5,6 +5,7 @@ import { MailBox } from "@models/types";
 import dotenv from "dotenv";
 import { ArtistAndGenres } from "./types";
 import _ from "lodash";
+import { partition } from "./utils";
 
 class Recommender {
   mailBox?: MailBox;
@@ -55,20 +56,17 @@ class Recommender {
     try {
       const tracks = this.mailBox?.tracks;
       const artistIds = _.uniq(_.map(tracks, (track) => track.artistIds));
-      const genreParseGroups = _.map(artistIds, (artistId, idx) => ({
-        id: artistId,
-        parseGroup: Math.floor(idx / 50),
-      }));
+      const genreParseGroups = partition(artistIds, 50);
 
       let groupNum = 0;
       while (true) {
         const filtered = _.filter(
           genreParseGroups,
-          (member) => member.parseGroup === groupNum
+          (member) => member.groupNum === groupNum
         );
         if (filtered.length === 0) break;
 
-        const ids = _.map(filtered, (filter) => filter.id).join(",");
+        const ids = _.map(filtered, (filter) => filter.data).join(",");
 
         const resGenres = await getArtists.call(this, ids);
         const artists = resGenres.data.artists;

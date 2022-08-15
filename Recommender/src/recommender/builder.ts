@@ -18,9 +18,10 @@ class RecommenderBuilder {
     await this.recommender.addAvailableGenres();
   }
 
-  // 3. ArtistAndGenres
+  // 3. ArtistAndGenres and AudioFeatures, for User
   async step3() {
     await this.recommender.addArtistAndGenres();
+    await this.recommender.addAudioFeatures();
   }
 
   get() {

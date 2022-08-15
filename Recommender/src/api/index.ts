@@ -3,6 +3,7 @@ import axios from "axios";
 import qs from "qs";
 import {
   HasToken,
+  ResAudioFeatures,
   ResAvailableGenres,
   ResGenArtists,
   ResGetToken,
@@ -38,6 +39,17 @@ export const getAvailableGenres = function (this: HasToken) {
 export const getArtists = function (this: HasToken, ids: string) {
   return axios.get<ResGenArtists>(
     `${APIURL}/artists?${qs.stringify({ ids })}`,
+    {
+      headers: {
+        authorization: `Bearer ${this.spotifyToken}`,
+      },
+    }
+  );
+};
+
+export const getFeatures = function (this: HasToken, ids: string) {
+  return axios.get<ResAudioFeatures>(
+    `${APIURL}/audio-features?${qs.stringify({ ids })}`,
     {
       headers: {
         authorization: `Bearer ${this.spotifyToken}`,

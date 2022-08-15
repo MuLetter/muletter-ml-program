@@ -5,9 +5,11 @@ import {
   HasToken,
   ResAudioFeatures,
   ResAvailableGenres,
-  ResGenArtists,
+  ResGetArtists,
+  ResGetRecommendations,
   ResGetToken,
 } from "./types";
+import { Seed } from "@recommender/types";
 
 dotenv.config();
 
@@ -37,7 +39,7 @@ export const getAvailableGenres = function (this: HasToken) {
 };
 
 export const getArtists = function (this: HasToken, ids: string) {
-  return axios.get<ResGenArtists>(
+  return axios.get<ResGetArtists>(
     `${APIURL}/artists?${qs.stringify({ ids })}`,
     {
       headers: {
@@ -50,6 +52,21 @@ export const getArtists = function (this: HasToken, ids: string) {
 export const getFeatures = function (this: HasToken, ids: string) {
   return axios.get<ResAudioFeatures>(
     `${APIURL}/audio-features?${qs.stringify({ ids })}`,
+    {
+      headers: {
+        authorization: `Bearer ${this.spotifyToken}`,
+      },
+    }
+  );
+};
+
+export const getRecommendations = function (this: HasToken, seed: Seed) {
+  return axios.get<ResGetRecommendations>(
+    `${APIURL}/recommendations?${qs.stringify({
+      ...seed,
+      market: "KR",
+      limit: 100,
+    })}`,
     {
       headers: {
         authorization: `Bearer ${this.spotifyToken}`,

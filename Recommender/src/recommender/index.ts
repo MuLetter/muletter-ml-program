@@ -1,11 +1,17 @@
-import { getArtists, getAvailableGenres, getFeatures, getToken } from "@api";
+import {
+  getArtists,
+  getAvailableGenres,
+  getFeatures,
+  getRecommendations,
+  getToken,
+} from "@api";
 import { dbConnect, dbDisconnect } from "@models/connect";
 import { MailBoxModel } from "@models/MailBox";
-import { MailBox } from "@models/types";
+import { MailBox, Track } from "@models/types";
 import dotenv from "dotenv";
 import { ArtistAndGenres, ProcessAudioFeatures, Seed } from "./types";
 import _ from "lodash";
-import { parseNeedFeatures, partition } from "./utils";
+import { FeaturesGenerator, parseNeedFeatures, partition } from "./utils";
 
 class Recommender {
   mailBox?: MailBox;
@@ -14,7 +20,9 @@ class Recommender {
   availableGenres?: string[];
   artistAndGenres?: ArtistAndGenres[];
   audioFeatures?: ProcessAudioFeatures[];
+  recoAudioFeatures?: ProcessAudioFeatures[];
   seeds?: Seed[];
+  recommendations?: Track[];
 
   constructor() {
     dotenv.config();
@@ -82,7 +90,10 @@ class Recommender {
         }));
 
         if (this.artistAndGenres)
-          _.concat(this.artistAndGenres, artistAndGenres);
+          this.artistAndGenres = _.concat(
+            this.artistAndGenres,
+            artistAndGenres
+          ) as any;
         else this.artistAndGenres = artistAndGenres as ArtistAndGenres[];
 
         groupNum++;
@@ -94,33 +105,9 @@ class Recommender {
 
   async addAudioFeatures() {
     try {
-      const trackIds = _.uniq(
-        _.map(this.mailBox?.tracks, (track) => track.trackId)
-      );
-      const partitioned = partition(trackIds, 100);
-
-      let groupNum = 0;
-      while (true) {
-        const filtered = _.filter(
-          partitioned,
-          (part) => part.groupNum === groupNum
-        );
-        if (filtered.length === 0) break;
-        const ids = _.map(filtered, (filter) => filter.data).join(",");
-
-        const res = await getFeatures.call(this, ids);
-        const audioFeatures = res.data.audio_features;
-
-        // 필요로 하는 것만 parsing
-        const processAudioFeatures = _.map(audioFeatures, parseNeedFeatures);
-        console.log(processAudioFeatures);
-
-        if (this.audioFeatures)
-          _.concat(this.audioFeatures, processAudioFeatures);
-        else this.audioFeatures = processAudioFeatures;
-
-        groupNum++;
-      }
+      this.audioFeatures = await new FeaturesGenerator(
+        this.mailBox!.tracks
+      ).generate(this);
     } catch (err) {
       console.error(err);
     }
@@ -144,7 +131,7 @@ class Recommender {
             ? acc
             : {
                 ...acc,
-                [`seed_${cur}`]: feature![cur],
+                [`target_${cur}`]: feature![cur],
               },
         {}
       );
@@ -157,6 +144,45 @@ class Recommender {
       };
     }) as any;
   }
+
+  async addRecomendations() {
+    let recommendations: Track[] = [];
+
+    try {
+      for (let seed of this.seeds!) {
+        const resRecommendations = await getRecommendations.call(this, seed);
+        const recos = resRecommendations.data.tracks;
+
+        recommendations = _.concat(
+          recommendations,
+          _.map(recos, (reco) => ({
+            trackId: reco.id,
+            trackName: reco.name,
+            artistIds: _.map(reco.artists, (artist) => artist.id).join(","),
+            artistNames: _.map(reco.artists, (artist) => artist.name).join(","),
+            image:
+              reco.album.images.length === 0 ? "" : reco.album.images[0].url,
+          }))
+        );
+      }
+    } catch (err) {
+      console.error(err);
+    }
+
+    this.recommendations = _.uniqBy(recommendations, "trackId");
+  }
+
+  async addRecoAudioFeatures() {
+    try {
+      this.recoAudioFeatures = await new FeaturesGenerator(
+        this.recommendations!
+      ).generate(this);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async mergeDatas() {}
 }
 
 export default Recommender;

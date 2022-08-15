@@ -27,6 +27,8 @@
   "_moduleAliases": {
     "@models": "dist/models",
     "@recommender": "dist/recommender",
-    "@api": "dist/api"
+    "@api": "dist/api",
+    "@kmeans": "dist/kmeans",
+    "@minmax-scaler": "dist/MinMaxScaler"
   }
 }

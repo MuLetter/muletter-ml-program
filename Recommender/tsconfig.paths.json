@@ -16,6 +16,12 @@
             ],
             "@api/*": [
                 "./api/*"
+            ],
+            "@kmeans": [
+                "./KMeans"
+            ],
+            "@minmax-scaler": [
+                "./MinMaxScaler"
             ]
         }
     }

@@ -26,5 +26,38 @@ const recommender = builder.get();
   } while (!kmeans.done);
   console.log(kmeans.labels);
 
+  const trackIdAndLabel = _.map(recommender.processIds, (trackId, idx) => ({
+    trackId,
+    label: kmeans.labels![idx],
+  }));
+  const userTrackIds = _.map(
+    recommender.mailBox?.tracks,
+    (track) => track.trackId
+  );
+  const userLabels = _.uniq(
+    _.map(
+      _.filter(trackIdAndLabel, ({ trackId }) =>
+        userTrackIds.includes(trackId as string)
+      ),
+      ({ label }) => label
+    )
+  );
+  console.log(userLabels);
+  const parsedRecoIds = _.map(
+    _.filter(
+      trackIdAndLabel,
+      ({ trackId, label }) =>
+        userLabels.includes(label) && !userTrackIds.includes(trackId as string)
+    ),
+    ({ trackId }) => trackId
+  );
+  console.log(parsedRecoIds);
+
+  console.log(
+    _.filter(recommender.recommendations, ({ trackId }) =>
+      parsedRecoIds.includes(trackId)
+    )
+  );
+
   recommender.close();
 })();

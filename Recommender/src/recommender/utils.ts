@@ -1,7 +1,9 @@
 import { getFeatures } from "@api";
 import { AudioFeature, HasToken } from "@api/types";
 import { Track } from "@models/types";
+import Recommender from "@recommender";
 import _ from "lodash";
+import mongoose from "mongoose";
 import { NEED_FEATURES } from "./common";
 import { PartitionData, ProcessAudioFeatures } from "./types";
 
@@ -55,4 +57,19 @@ export class FeaturesGenerator {
 
     return features;
   }
+}
+
+export function checkBuildItems(this: Recommender) {
+  if (mongoose.connection.readyState !== 1)
+    throw new Error("[step 1 required.] mongoose disconnected.");
+  if (!this.spotifyToken || !this.mailBox || !this.availableGenres)
+    throw new Error(
+      "[step 2 required.] token, mailbox, availableGenres Empty!"
+    );
+  if (!this.artistAndGenres || !this.audioFeatures)
+    throw new Error("[step 3 required.] artistAndGenres, audioFeatures Empty!");
+  if (!this.seeds || !this.recommendations || !this.recoAudioFeatures)
+    throw new Error(
+      "[step 4 required.] seeds, recommendations, recoAudioFeatures Empty!"
+    );
 }

@@ -10,7 +10,14 @@ import { MailBox, Track } from "@models/types";
 import dotenv from "dotenv";
 import { ArtistAndGenres, ProcessAudioFeatures, Seed } from "./types";
 import _ from "lodash";
-import { FeaturesGenerator, parseNeedFeatures, partition } from "./utils";
+import {
+  checkBuildItems,
+  FeaturesGenerator,
+  parseNeedFeatures,
+  partition,
+} from "./utils";
+import MinMaxScaler from "@minmax-scaler";
+import KMeans from "@kmeans";
 
 class Recommender {
   mailBox?: MailBox;
@@ -19,9 +26,12 @@ class Recommender {
   availableGenres?: string[];
   artistAndGenres?: ArtistAndGenres[];
   audioFeatures?: ProcessAudioFeatures[];
-  recoAudioFeatures?: ProcessAudioFeatures[];
   seeds?: Seed[];
   recommendations?: Track[];
+  recoAudioFeatures?: ProcessAudioFeatures[];
+
+  // run processing
+  kmeans?: KMeans;
 
   constructor() {
     dotenv.config();
@@ -199,6 +209,23 @@ class Recommender {
       _.tail(_.values(feature))
     );
   }
+
+  runKMeans = () => {
+    checkBuildItems.call(this);
+
+    // 1. min-max scaling
+    const scaler = new MinMaxScaler(this.processDatas as number[][]);
+    const datas = scaler.fit().transfrom();
+
+    // 2. KMeans Run
+    const kmeans = new KMeans(datas);
+    kmeans.setCentroids(2);
+    do {
+      kmeans.next();
+    } while (!kmeans.done);
+
+    this.kmeans = kmeans;
+  };
 }
 
 export default Recommender;

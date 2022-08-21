@@ -1,5 +1,7 @@
 import { getFeatures } from "@api";
 import { AudioFeature, HasToken } from "@api/types";
+import { euclideanDistance } from "@kmeans/utils";
+import MinMaxScaler from "@minmax-scaler";
 import { Track } from "@models/types";
 import Recommender from "@recommender";
 import _ from "lodash";
@@ -72,4 +74,39 @@ export function checkBuildItems(this: Recommender) {
     throw new Error(
       "[step 4 required.] seeds, recommendations, recoAudioFeatures Empty!"
     );
+}
+
+export function dropTrackByLabelCount(
+  tracks: Track[],
+  features: ProcessAudioFeatures[],
+  idsAndLabels: (string | number | undefined)[][]
+): Track[] {
+  let labelCounts: any = _.countBy(tracks, ({ label }) => label);
+  labelCounts = _.toPairs(labelCounts);
+  const maxCountLabel = parseInt(
+    _.maxBy(labelCounts, ([label, count]) => count) as string[][0]
+  );
+
+  const targetRecoIds = _.unzip(
+    _.filter(idsAndLabels, ([, label]) => label === maxCountLabel)
+  )[0];
+  const targetFeatureObjs = _.filter(features, ({ id }) =>
+    targetRecoIds.includes(id)
+  );
+  const targetIds = _.map(targetFeatureObjs, (feature) => _.values(feature)[0]);
+  const targetFeatures = _.map(targetFeatureObjs, (feature) =>
+    _.tail(_.values(feature))
+  );
+  const scaler = new MinMaxScaler(targetFeatures as number[][]);
+  const targetScaling = scaler.fit().transfrom();
+  const targetMeanDistance = _.map(targetScaling, (a) =>
+    _.mean(_.map(targetScaling, (b) => euclideanDistance(a, b)))
+  );
+  const targetIdsAndMeanDistance = _.zip(targetIds, targetMeanDistance);
+  const dropTrackId = _.maxBy(
+    targetIdsAndMeanDistance,
+    ([, distance]) => distance
+  )![0];
+
+  return _.filter(tracks, ({ trackId }) => trackId !== dropTrackId);
 }

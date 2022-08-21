@@ -20,6 +20,9 @@
             "@kmeans": [
                 "./KMeans"
             ],
+            "@kmeans/*": [
+                "./KMeans/*"
+            ],
             "@minmax-scaler": [
                 "./MinMaxScaler"
             ]

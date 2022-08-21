@@ -3,6 +3,8 @@ import RecommenderBuilder from "@recommender/builder";
 import _ from "lodash";
 import MinMaxScaler from "@minmax-scaler";
 import KMeans from "@kmeans";
+import { euclideanDistance } from "@kmeans/utils";
+import { dropTrackByLabelCount } from "@recommender/utils";
 
 const mailBoxId = "62f9a6221b1ae3a082abce38";
 const builder = new RecommenderBuilder();
@@ -55,20 +57,13 @@ const recommender = builder.get();
 
   // 지워야 할 경우
   // drop RecoItem
-  // max count parsing
-  let labelCounts: any = _.countBy(recoTracks, ({ label }) => label);
-  labelCounts = _.toPairs(labelCounts);
-  const maxCountLabel = parseInt(
-    _.maxBy(labelCounts, ([label, count]) => count) as string[][0]
+  console.log(
+    dropTrackByLabelCount(
+      recoTracks,
+      recommender.recoAudioFeatures!,
+      recoIdsAndLabels
+    ).length
   );
-  console.log(labelCounts);
-  console.log(maxCountLabel);
-
-  // drop target
-  const targetRecoIds = _.unzip(
-    _.filter(recoIdsAndLabels, ([, label]) => label === maxCountLabel)
-  )[0];
-  console.log(targetRecoIds);
 
   // console.log(recommender.recoAudioFeatures);
   // let recoIdsAndLabels = ?

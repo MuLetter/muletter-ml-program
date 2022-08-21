@@ -54,16 +54,34 @@ const recommender = builder.get();
     ...recoTrack,
     label: recoIdsKeyLabels[recoTrack.trackId] as number,
   }));
+  console.log(recoIdsKeyLabels);
 
   // 지워야 할 경우
   // drop RecoItem
-  console.log(
-    dropTrackByLabelCount(
-      recoTracks,
-      recommender.recoAudioFeatures!,
-      recoIdsAndLabels
-    ).length
+  console.log(recoTracks.length);
+  recoTracks = dropTrackByLabelCount(
+    recoTracks,
+    recommender.recoAudioFeatures!,
+    recoIdsAndLabels
   );
+  console.log(recoTracks.length);
+
+  console.log(recommender.recommendations!.length);
+  console.log(recommender.recoAudioFeatures!.length);
+
+  // filter
+  recoIds = _.map(recoTracks, ({ trackId }) => trackId) as string[];
+  const filteredRecommendations = _.filter(
+    recommender.recommendations,
+    ({ trackId }) => !recoIds.includes(trackId)
+  );
+  const filteredRecoAudioFeatures = _.filter(
+    recommender.recoAudioFeatures,
+    ({ id }) => !recoIds.includes(id)
+  );
+
+  console.log(filteredRecommendations.length);
+  console.log(filteredRecoAudioFeatures.length);
 
   // console.log(recommender.recoAudioFeatures);
   // let recoIdsAndLabels = ?

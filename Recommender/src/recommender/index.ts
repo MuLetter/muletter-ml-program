@@ -155,7 +155,7 @@ class Recommender {
     }) as any;
   }
 
-  async addRecomendations() {
+  async addRecommendations() {
     let recommendations: Track[] = [];
 
     try {

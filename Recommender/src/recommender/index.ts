@@ -20,6 +20,7 @@ import MinMaxScaler from "@minmax-scaler";
 import KMeans from "@kmeans";
 
 class Recommender {
+  step: number;
   mailBox?: MailBox;
 
   spotifyToken?: string;
@@ -32,9 +33,11 @@ class Recommender {
 
   // run processing
   kmeans?: KMeans;
+  recoIdsAndLabels?: (string | number | undefined)[][];
 
   constructor() {
     dotenv.config();
+    this.step = 0;
   }
 
   // db connect
@@ -225,6 +228,23 @@ class Recommender {
     } while (!kmeans.done);
 
     this.kmeans = kmeans;
+  };
+
+  parsingKMeansLabel = () => {
+    const userIds = _.uniq(
+      _.map(this.mailBox?.tracks, ({ trackId }) => trackId)
+    );
+    const trackIdAndLabels = _.zip(this.processIds, this.kmeans!.labels);
+    let userIdsAndLabels = _.filter(trackIdAndLabels, ([id]) =>
+      _.includes(userIds, id)
+    );
+    let userLabels = _.uniq(_.unzip(userIdsAndLabels)[1]);
+    let recoIdsAndLabels = _.filter(
+      trackIdAndLabels,
+      ([id, label]) => !_.includes(userIds, id) && _.includes(userLabels, label)
+    );
+
+    this.recoIdsAndLabels = recoIdsAndLabels;
   };
 }
 

@@ -18,4 +18,6 @@ export type Track = {
   artistIds: string;
   artistNames: string;
   image: string;
+
+  label?: number;
 };

@@ -20,6 +20,11 @@ const recommender = builder.get();
   recommender.runKMeans();
   console.log(recommender.kmeans?.labels);
 
+  // recommender.parsingKMeansLabel();
+  // console.log(recommender.recoIdsAndLabels);
+
+  // // saveRecoTracks
+
   const userIds = _.uniq(
     _.map(recommender.mailBox?.tracks, ({ trackId }) => trackId)
   );
@@ -31,10 +36,38 @@ const recommender = builder.get();
     _.includes(userIds, id)
   );
   let userLabels = _.uniq(_.unzip(userIdsAndLabels)[1]);
+
   let recoIdsAndLabels = _.filter(
     trackIdAndLabels,
     ([id, label]) => !_.includes(userIds, id) && _.includes(userLabels, label)
   );
+  let [recoIds, recoLabels] = _.unzip(recoIdsAndLabels);
+
+  // recoTracks
+  let recoTracks = _.filter(recommender.recommendations, ({ trackId }) =>
+    recoIds.includes(trackId)
+  );
+  let recoIdsKeyLabels = _.zipObject(recoIds as string[], recoLabels);
+  recoTracks = _.map(recoTracks, (recoTrack) => ({
+    ...recoTrack,
+    label: recoIdsKeyLabels[recoTrack.trackId] as number,
+  }));
+
+  // 지워야 할 경우
+  // drop RecoItem
+  // max count parsing
+  let labelCounts: any = _.countBy(recoTracks, ({ label }) => label);
+  labelCounts = _.toPairs(labelCounts);
+  const maxCountLabel = parseInt(
+    _.maxBy(labelCounts, ([label, count]) => count) as string[][0]
+  );
+  console.log(labelCounts);
+  console.log(maxCountLabel);
+
+  // round = 0
+
+  // baseMusic In
+  console.log(userLabels);
 
   // let recoIdsAndLabels =
 

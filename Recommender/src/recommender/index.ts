@@ -20,7 +20,6 @@ import MinMaxScaler from "@minmax-scaler";
 import KMeans from "@kmeans";
 
 class Recommender {
-  step: number;
   mailBox?: MailBox;
 
   spotifyToken?: string;
@@ -37,7 +36,6 @@ class Recommender {
 
   constructor() {
     dotenv.config();
-    this.step = 0;
   }
 
   // db connect

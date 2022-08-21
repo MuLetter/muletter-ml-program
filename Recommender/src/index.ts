@@ -64,12 +64,14 @@ const recommender = builder.get();
   console.log(labelCounts);
   console.log(maxCountLabel);
 
-  // round = 0
+  // drop target
+  const targetRecoIds = _.unzip(
+    _.filter(recoIdsAndLabels, ([, label]) => label === maxCountLabel)
+  )[0];
+  console.log(targetRecoIds);
 
-  // baseMusic In
-  console.log(userLabels);
-
-  // let recoIdsAndLabels =
+  // console.log(recommender.recoAudioFeatures);
+  // let recoIdsAndLabels = ?
 
   // const trackIdAndLabels = _.zip(recommender.processIds, kmeans.labels);
   // console.log(_.groupBy(trackIdAndLabels, ([id, label]) => label));

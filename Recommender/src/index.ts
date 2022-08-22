@@ -19,69 +19,70 @@ const recommender = builder.get();
 
   await builder.step4();
 
-  recommender.runKMeans();
-  console.log(recommender.kmeans?.labels);
+  recommender.run();
+
+  // recommender.runKMeans();
+  // console.log(recommender.kmeans?.labels);
 
   // recommender.parsingKMeansLabel();
   // console.log(recommender.recoIdsAndLabels);
 
-  // // saveRecoTracks
+  // // // saveRecoTracks
+  // const userIds = _.uniq(
+  //   _.map(recommender.mailBox?.tracks, ({ trackId }) => trackId)
+  // );
+  // const trackIdAndLabels = _.zip(
+  //   recommender.processIds,
+  //   recommender.kmeans!.labels
+  // );
+  // let userIdsAndLabels = _.filter(trackIdAndLabels, ([id]) =>
+  //   _.includes(userIds, id)
+  // );
+  // let userLabels = _.uniq(_.unzip(userIdsAndLabels)[1]);
 
-  const userIds = _.uniq(
-    _.map(recommender.mailBox?.tracks, ({ trackId }) => trackId)
-  );
-  const trackIdAndLabels = _.zip(
-    recommender.processIds,
-    recommender.kmeans!.labels
-  );
-  let userIdsAndLabels = _.filter(trackIdAndLabels, ([id]) =>
-    _.includes(userIds, id)
-  );
-  let userLabels = _.uniq(_.unzip(userIdsAndLabels)[1]);
+  // let recoIdsAndLabels = _.filter(
+  //   trackIdAndLabels,
+  //   ([id, label]) => !_.includes(userIds, id) && _.includes(userLabels, label)
+  // );
+  // let [recoIds, recoLabels] = _.unzip(recoIdsAndLabels);
 
-  let recoIdsAndLabels = _.filter(
-    trackIdAndLabels,
-    ([id, label]) => !_.includes(userIds, id) && _.includes(userLabels, label)
-  );
-  let [recoIds, recoLabels] = _.unzip(recoIdsAndLabels);
-
-  // recoTracks
-  let recoTracks = _.filter(recommender.recommendations, ({ trackId }) =>
-    recoIds.includes(trackId)
-  );
-  let recoIdsKeyLabels = _.zipObject(recoIds as string[], recoLabels);
-  recoTracks = _.map(recoTracks, (recoTrack) => ({
-    ...recoTrack,
-    label: recoIdsKeyLabels[recoTrack.trackId] as number,
-  }));
-  console.log(recoIdsKeyLabels);
+  // // recoTracks
+  // let recoTracks = _.filter(recommender.recommendations, ({ trackId }) =>
+  //   recoIds.includes(trackId)
+  // );
+  // let recoIdsKeyLabels = _.zipObject(recoIds as string[], recoLabels);
+  // recoTracks = _.map(recoTracks, (recoTrack) => ({
+  //   ...recoTrack,
+  //   label: recoIdsKeyLabels[recoTrack.trackId] as number,
+  // }));
+  // console.log(recoIdsKeyLabels);
 
   // 지워야 할 경우
   // drop RecoItem
-  console.log(recoTracks.length);
-  recoTracks = dropTrackByLabelCount(
-    recoTracks,
-    recommender.recoAudioFeatures!,
-    recoIdsAndLabels
-  );
-  console.log(recoTracks.length);
+  // console.log(recoTracks.length);
+  // recoTracks = dropTrackByLabelCount(
+  //   recoTracks,
+  //   recommender.recoAudioFeatures!,
+  //   recoIdsAndLabels
+  // );
+  // console.log(recoTracks.length);
 
-  console.log(recommender.recommendations!.length);
-  console.log(recommender.recoAudioFeatures!.length);
+  // console.log(recommender.recommendations!.length);
+  // console.log(recommender.recoAudioFeatures!.length);
 
-  // filter
-  recoIds = _.map(recoTracks, ({ trackId }) => trackId) as string[];
-  const filteredRecommendations = _.filter(
-    recommender.recommendations,
-    ({ trackId }) => !recoIds.includes(trackId)
-  );
-  const filteredRecoAudioFeatures = _.filter(
-    recommender.recoAudioFeatures,
-    ({ id }) => !recoIds.includes(id)
-  );
+  // // filter, real saving
+  // recoIds = _.map(recoTracks, ({ trackId }) => trackId) as string[];
+  // const filteredRecommendations = _.filter(
+  //   recommender.recommendations,
+  //   ({ trackId }) => !recoIds.includes(trackId)
+  // );
+  // const filteredRecoAudioFeatures = _.filter(
+  //   recommender.recoAudioFeatures,
+  //   ({ id }) => !recoIds.includes(id)
+  // );
 
-  console.log(filteredRecommendations.length);
-  console.log(filteredRecoAudioFeatures.length);
+  // console.log(filteredRecommendations.length);
+  // console.log(filteredRecoAudioFeatures.length);
 
   // console.log(recommender.recoAudioFeatures);
   // let recoIdsAndLabels = ?

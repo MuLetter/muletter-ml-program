@@ -33,8 +33,10 @@ class Recommender {
   // run processing
   kmeans?: KMeans;
   recoIdsAndLabels?: (string | number | undefined)[][];
+  recoTracks: Track[];
 
   constructor() {
+    this.recoTracks = [];
     dotenv.config();
   }
 
@@ -210,6 +212,55 @@ class Recommender {
       _.tail(_.values(feature))
     );
   }
+
+  run = () => {
+    this.runKMeans();
+
+    const result = this.labelParsing();
+    console.log(result.isSaving, result.recoTracks?.length);
+  };
+
+  labelParsing = () => {
+    let isSaving = false;
+
+    const userIds = _.uniq(
+      _.map(this.mailBox?.tracks, ({ trackId }) => trackId)
+    );
+    const trackIdAndLabels = _.zip(this.processIds, this.kmeans!.labels);
+    let userIdsAndLabels = _.filter(trackIdAndLabels, ([id]) =>
+      _.includes(userIds, id)
+    );
+    let userLabels = _.uniq(_.unzip(userIdsAndLabels)[1]);
+
+    let recoIdsAndLabels = _.filter(
+      trackIdAndLabels,
+      ([id, label]) => !_.includes(userIds, id) && _.includes(userLabels, label)
+    );
+    let [recoIds, recoLabels] = _.unzip(recoIdsAndLabels);
+
+    // recoTracks
+    let recoTracks = _.filter(this.recommendations, ({ trackId }) =>
+      recoIds.includes(trackId)
+    );
+    if (this.recoTracks.length + recoTracks.length > 20) {
+      isSaving = false;
+      return {
+        isSaving,
+        recoTracks,
+      };
+    } else {
+      isSaving = true;
+      return {
+        isSaving,
+      };
+    }
+    // let recoIdsKeyLabels = _.zipObject(recoIds as string[], recoLabels);
+    // recoTracks = _.map(recoTracks, (recoTrack) => ({
+    //   ...recoTrack,
+    //   label: recoIdsKeyLabels[recoTrack.trackId] as number,
+    // }));
+    // console.log(recoIdsKeyLabels);
+  };
 
   runKMeans = () => {
     checkBuildItems.call(this);

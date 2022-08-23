@@ -6,18 +6,22 @@ import KMeans from "@kmeans";
 import { euclideanDistance } from "@kmeans/utils";
 import { dropTrackByLabelCount } from "@recommender/utils";
 
-const mailBoxId = "62f9a6221b1ae3a082abce38";
+const mailBoxId = "63044282eb7f4e96553cdd43";
 const builder = new RecommenderBuilder();
 const recommender = builder.get();
 
 (async () => {
-  await builder.step1();
+  try {
+    await builder.step1();
 
-  await builder.step2(mailBoxId);
+    await builder.step2(mailBoxId);
 
-  await builder.step3();
+    await builder.step3();
 
-  await builder.step4();
+    await builder.step4();
+  } catch (err) {
+    console.error(err);
+  }
 
   recommender.run();
 

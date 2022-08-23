@@ -81,8 +81,18 @@ export function dropTrackByLabelCount(
   features: ProcessAudioFeatures[],
   idsAndLabels: (string | number | undefined)[][]
 ): Track[] {
+  let [ids, labels] = _.unzip(idsAndLabels);
+  let idsKeyLabels = _.zipObject(ids as string[], labels);
+
+  tracks = _.map(tracks, (track) => ({
+    ...track,
+    label: idsKeyLabels[track.trackId] as number,
+  }));
+
   let labelCounts: any = _.countBy(tracks, ({ label }) => label);
   labelCounts = _.toPairs(labelCounts);
+  console.log(labelCounts);
+
   const maxCountLabel = parseInt(
     _.maxBy(labelCounts, ([label, count]) => count) as string[][0]
   );

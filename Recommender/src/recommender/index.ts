@@ -12,6 +12,7 @@ import { ArtistAndGenres, ProcessAudioFeatures, Seed } from "./types";
 import _ from "lodash";
 import {
   checkBuildItems,
+  dropTrackByLabelCount,
   FeaturesGenerator,
   parseNeedFeatures,
   partition,
@@ -60,8 +61,11 @@ class Recommender {
 
         const resToken = await getToken();
         this.spotifyToken = resToken.data.access_token;
+      } else {
+        throw new Error("MailBox Not Found!");
       }
     } catch (err) {
+      console.log(this.spotifyToken);
       console.error(err);
     }
   }
@@ -71,6 +75,7 @@ class Recommender {
       const resAvailableGenres = await getAvailableGenres.call(this);
       this.availableGenres = resAvailableGenres.data.genres;
     } catch (err) {
+      console.log(this.spotifyToken);
       console.error(err);
     }
   }
@@ -111,6 +116,7 @@ class Recommender {
         groupNum++;
       }
     } catch (err) {
+      console.log(this.spotifyToken);
       console.error(err);
     }
   }
@@ -121,6 +127,7 @@ class Recommender {
         this.mailBox!.tracks
       ).generate(this);
     } catch (err) {
+      console.log(this.spotifyToken);
       console.error(err);
     }
   }
@@ -178,6 +185,7 @@ class Recommender {
         );
       }
     } catch (err) {
+      console.log(this.spotifyToken);
       console.error(err);
     }
 
@@ -190,6 +198,7 @@ class Recommender {
         this.recommendations!
       ).generate(this);
     } catch (err) {
+      console.log(this.spotifyToken);
       console.error(err);
     }
   }
@@ -216,33 +225,64 @@ class Recommender {
   run = () => {
     this.runKMeans();
 
-    const result = this.labelParsing();
-    console.log(result.isSaving, result.recoTracks?.length);
+    let { isSaving, recoTracks } = this.labelParsing();
+
+    // 수량 조정 - 제거
+    if (!isSaving) {
+      let recoIdsAndLabels = this.getRecoIdsAndLabels();
+      while (this.recoTracks.length + recoTracks.length > 50) {
+        recoTracks = dropTrackByLabelCount(
+          recoTracks,
+          this.recoAudioFeatures!,
+          _.zip.apply(null, recoIdsAndLabels) as any
+        );
+
+        console.log(recoTracks.length);
+        recoIdsAndLabels = this.getRecoIdsAndLabels(recoTracks);
+      }
+    }
+  };
+
+  // label 잇는 track 이어야 함
+  getRecoIdsAndLabels = (recoTracks?: Track[]) => {
+    if (recoTracks) {
+      let recoIdsAndLabels = _.map(recoTracks, ({ trackId, label }) => [
+        trackId,
+        label,
+      ]);
+      recoIdsAndLabels = _.unzip(recoIdsAndLabels);
+      return recoIdsAndLabels;
+    } else {
+      const userIds = _.uniq(
+        _.map(this.mailBox?.tracks, ({ trackId }) => trackId)
+      );
+      const trackIdAndLabels = _.zip(this.processIds, this.kmeans!.labels);
+      let userIdsAndLabels = _.filter(trackIdAndLabels, ([id]) =>
+        _.includes(userIds, id)
+      );
+      let userLabels = _.uniq(_.unzip(userIdsAndLabels)[1]);
+
+      let recoIdsAndLabels = _.filter(
+        trackIdAndLabels,
+        ([id, label]) =>
+          !_.includes(userIds, id) && _.includes(userLabels, label)
+      );
+      recoIdsAndLabels = _.unzip(recoIdsAndLabels);
+
+      return recoIdsAndLabels;
+    }
   };
 
   labelParsing = () => {
     let isSaving = false;
 
-    const userIds = _.uniq(
-      _.map(this.mailBox?.tracks, ({ trackId }) => trackId)
-    );
-    const trackIdAndLabels = _.zip(this.processIds, this.kmeans!.labels);
-    let userIdsAndLabels = _.filter(trackIdAndLabels, ([id]) =>
-      _.includes(userIds, id)
-    );
-    let userLabels = _.uniq(_.unzip(userIdsAndLabels)[1]);
-
-    let recoIdsAndLabels = _.filter(
-      trackIdAndLabels,
-      ([id, label]) => !_.includes(userIds, id) && _.includes(userLabels, label)
-    );
-    let [recoIds, recoLabels] = _.unzip(recoIdsAndLabels);
+    const [recoIds] = this.getRecoIdsAndLabels();
 
     // recoTracks
     let recoTracks = _.filter(this.recommendations, ({ trackId }) =>
       recoIds.includes(trackId)
     );
-    if (this.recoTracks.length + recoTracks.length > 20) {
+    if (this.recoTracks.length + recoTracks.length > 50) {
       isSaving = false;
       return {
         isSaving,
@@ -252,6 +292,7 @@ class Recommender {
       isSaving = true;
       return {
         isSaving,
+        recoTracks,
       };
     }
     // let recoIdsKeyLabels = _.zipObject(recoIds as string[], recoLabels);

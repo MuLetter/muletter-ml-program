@@ -237,10 +237,25 @@ class Recommender {
           _.zip.apply(null, recoIdsAndLabels) as any
         );
 
-        console.log(recoTracks.length);
+        // console.log(recoTracks.length);
         recoIdsAndLabels = this.getRecoIdsAndLabels(recoTracks);
       }
     }
+
+    this.save(recoTracks);
+  };
+
+  save = (recoTracks: Track[]) => {
+    this.recoTracks = _.concat(this.recoTracks, recoTracks);
+    const recoIds = _.map(recoTracks, ({ trackId }) => trackId) as string[];
+    this.recommendations = _.filter(
+      this.recommendations,
+      ({ trackId }) => !recoIds.includes(trackId)
+    );
+    this.recoAudioFeatures = _.filter(
+      this.recoAudioFeatures,
+      ({ id }) => !recoIds.includes(id)
+    );
   };
 
   // label 잇는 track 이어야 함

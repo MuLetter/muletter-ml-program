@@ -91,7 +91,7 @@ export function dropTrackByLabelCount(
 
   let labelCounts: any = _.countBy(tracks, ({ label }) => label);
   labelCounts = _.toPairs(labelCounts);
-  console.log(labelCounts);
+  // console.log(labelCounts);
 
   const maxCountLabel = parseInt(
     _.maxBy(labelCounts, ([label, count]) => count) as string[][0]

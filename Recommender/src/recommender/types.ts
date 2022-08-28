@@ -51,5 +51,5 @@ export type ArtistAndGenres = {
 };
 
 export interface IRecommederAdjust extends Recommender {
-  check: () => void;
+  next: () => IteratorResult<number>;
 }

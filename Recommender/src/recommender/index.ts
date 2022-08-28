@@ -14,7 +14,6 @@ import {
   checkBuildItems,
   dropTrackByLabelCount,
   FeaturesGenerator,
-  parseNeedFeatures,
   partition,
 } from "./utils";
 import MinMaxScaler from "@minmax-scaler";
@@ -37,6 +36,9 @@ class Recommender {
   kmeans?: KMeans;
   recoIdsAndLabels?: (string | number | undefined)[][];
   recoTracks: Track[];
+
+  MIN_LENGTH: number = 80;
+  MAX_LENGTH: number = 100;
 
   constructor() {
     this.recoTracks = [];
@@ -226,36 +228,22 @@ class Recommender {
 
   run = () => {
     this.runKMeans();
-
-    let { isSaving, recoTracks } = this.labelParsing();
+    let recoTracks = this.labelParsing();
 
     // 수량 조정 - 제거
-    if (!isSaving) {
-      let recoIdsAndLabels = this.getRecoIdsAndLabels();
-      while (this.recoTracks.length + recoTracks.length > 50) {
-        recoTracks = dropTrackByLabelCount(
-          recoTracks,
-          this.recoAudioFeatures!,
-          _.zip.apply(null, recoIdsAndLabels) as any
-        );
-
-        // console.log(recoTracks.length);
-        recoIdsAndLabels = this.getRecoIdsAndLabels(recoTracks);
-      }
+    let recoIdsAndLabels = this.getRecoIdsAndLabels();
+    while (this.recoTracks.length + recoTracks.length > this.MAX_LENGTH) {
+      recoTracks = dropTrackByLabelCount(
+        recoTracks,
+        this.recoAudioFeatures!,
+        _.zip.apply(null, recoIdsAndLabels) as any
+      );
+      // console.log(recoTracks.length);
+      recoIdsAndLabels = this.getRecoIdsAndLabels(recoTracks);
     }
 
     // 수량 조정 - 제거
     this.save(recoTracks);
-  };
-
-  run2 = () => {
-    this.runKMeans();
-
-    let { isSaving, recoTracks } = this.labelParsing();
-
-    if (!isSaving) {
-    }
-    // 수량 조정 - 증가
   };
 
   save = (recoTracks: Track[]) => {
@@ -319,19 +307,21 @@ class Recommender {
     //     recoTracks,
     //   };
     // }
-    if (this.recoTracks.length + recoTracks.length < 150) {
-      isSaving = false;
-      return {
-        isSaving,
-        recoTracks,
-      };
-    } else {
-      isSaving = true;
-      return {
-        isSaving,
-        recoTracks,
-      };
-    }
+
+    return recoTracks;
+    // if (this.recoTracks.length + recoTracks.length > this.MAX_LENGTH) {
+    //   isSaving = false;
+    //   return {
+    //     isSaving,
+    //     recoTracks,
+    //   };
+    // } else {
+    //   isSaving = true;
+    //   return {
+    //     isSaving,
+    //     recoTracks,
+    //   };
+    // }
     // let recoIdsKeyLabels = _.zipObject(recoIds as string[], recoLabels);
     // recoTracks = _.map(recoTracks, (recoTrack) => ({
     //   ...recoTrack,

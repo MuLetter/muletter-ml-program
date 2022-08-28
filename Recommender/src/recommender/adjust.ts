@@ -8,11 +8,18 @@ function RecommenderAdjust<T extends { new (...args: any[]): Recommender }>(
   return class extends constructor {
     constructor(...args: any[]) {
       super();
-
-      console.log("adjusting");
     }
-    check() {
-      console.log("adjust testing");
+    [Symbol.iterator]() {
+      return this;
+    }
+    next() {
+      this.run();
+      if (
+        this.recoTracks.length <= this.MAX_LENGTH &&
+        this.recoTracks.length >= this.MIN_LENGTH
+      )
+        return { value: this.recoTracks.length, done: true };
+      else return { value: this.recoTracks.length, done: false };
     }
   };
 }

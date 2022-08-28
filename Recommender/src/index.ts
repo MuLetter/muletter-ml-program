@@ -19,7 +19,11 @@ const recommender = builder.get();
     console.error(err);
   }
 
-  recommender.check();
+  for (let reco of recommender) {
+    console.log(reco);
+  }
+  console.log(recommender.recoTracks.length);
+
   // console.log(recommender.recommendations!.length);
   // console.log(recommender.recoAudioFeatures!.length);
 

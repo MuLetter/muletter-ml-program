@@ -112,6 +112,7 @@ export function dropTrackByLabelCount(
   const targetMeanDistance = _.map(targetScaling, (a) =>
     _.mean(_.map(targetScaling, (b) => euclideanDistance(a, b)))
   );
+
   const targetIdsAndMeanDistance = _.zip(targetIds, targetMeanDistance);
   const dropTrackId = _.maxBy(
     targetIdsAndMeanDistance,

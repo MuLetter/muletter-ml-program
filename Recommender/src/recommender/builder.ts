@@ -1,11 +1,10 @@
 import Recommender from "@recommender";
-import { IRecommederAdjust } from "./types";
 
 class RecommenderBuilder {
-  recommender: IRecommederAdjust;
+  recommender: Recommender;
 
   constructor() {
-    this.recommender = new Recommender() as IRecommederAdjust;
+    this.recommender = new Recommender();
   }
 
   // 1. 추천자 객체 db connect
@@ -32,8 +31,8 @@ class RecommenderBuilder {
     await this.recommender.addRecoAudioFeatures();
   }
 
-  get() {
-    return this.recommender;
+  get(): Iterable<Recommender> & Recommender {
+    return this.recommender as Iterable<Recommender> & Recommender;
   }
 }
 

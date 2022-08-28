@@ -22,15 +22,15 @@ const recommender = builder.get();
   } catch (err) {
     console.error(err);
   }
-  console.log(recommender.recommendations!.length);
-  console.log(recommender.recoAudioFeatures!.length);
+  // console.log(recommender.recommendations!.length);
+  // console.log(recommender.recoAudioFeatures!.length);
 
-  recommender.run();
-  const recoTracks = recommender.recoTracks;
-  console.log(recoTracks.length);
+  // recommender.run2();
+  // const recoTracks = recommender.recoTracks;
+  // console.log(recoTracks.length);
 
-  console.log(recommender.recommendations!.length);
-  console.log(recommender.recoAudioFeatures!.length);
+  // console.log(recommender.recommendations!.length);
+  // console.log(recommender.recoAudioFeatures!.length);
 
   // recommender.runKMeans();
   // console.log(recommender.kmeans?.labels);

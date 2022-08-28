@@ -19,7 +19,9 @@ import {
 } from "./utils";
 import MinMaxScaler from "@minmax-scaler";
 import KMeans from "@kmeans";
+import RecommenderAdjust from "./adjust";
 
+@RecommenderAdjust
 class Recommender {
   mailBox?: MailBox;
 
@@ -242,7 +244,18 @@ class Recommender {
       }
     }
 
+    // 수량 조정 - 제거
     this.save(recoTracks);
+  };
+
+  run2 = () => {
+    this.runKMeans();
+
+    let { isSaving, recoTracks } = this.labelParsing();
+
+    if (!isSaving) {
+    }
+    // 수량 조정 - 증가
   };
 
   save = (recoTracks: Track[]) => {
@@ -297,7 +310,16 @@ class Recommender {
     let recoTracks = _.filter(this.recommendations, ({ trackId }) =>
       recoIds.includes(trackId)
     );
-    if (this.recoTracks.length + recoTracks.length > 50) {
+
+    // 수량 조정 - 제거
+    // if (this.recoTracks.length + recoTracks.length > 50) {
+    //   isSaving = false;
+    //   return {
+    //     isSaving,
+    //     recoTracks,
+    //   };
+    // }
+    if (this.recoTracks.length + recoTracks.length < 150) {
       isSaving = false;
       return {
         isSaving,

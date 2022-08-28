@@ -1,3 +1,5 @@
+import Recommender from "@recommender";
+
 export type Seed = {
   [key: string]: string | number;
   seed_tracks: string;
@@ -47,3 +49,7 @@ export type ArtistAndGenres = {
   id: string;
   genres: string[];
 };
+
+export interface IRecommederAdjust extends Recommender {
+  check: () => void;
+}

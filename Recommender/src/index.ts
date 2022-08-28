@@ -1,10 +1,6 @@
 import "module-alias/register";
 import RecommenderBuilder from "@recommender/builder";
 import _ from "lodash";
-import MinMaxScaler from "@minmax-scaler";
-import KMeans from "@kmeans";
-import { euclideanDistance } from "@kmeans/utils";
-import { dropTrackByLabelCount } from "@recommender/utils";
 
 const mailBoxId = "63044282eb7f4e96553cdd43";
 const builder = new RecommenderBuilder();
@@ -22,6 +18,8 @@ const recommender = builder.get();
   } catch (err) {
     console.error(err);
   }
+
+  recommender.check();
   // console.log(recommender.recommendations!.length);
   // console.log(recommender.recoAudioFeatures!.length);
 

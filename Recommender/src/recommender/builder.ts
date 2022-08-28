@@ -1,10 +1,11 @@
 import Recommender from "@recommender";
+import { IRecommederAdjust } from "./types";
 
 class RecommenderBuilder {
-  recommender: Recommender;
+  recommender: IRecommederAdjust;
 
   constructor() {
-    this.recommender = new Recommender();
+    this.recommender = new Recommender() as IRecommederAdjust;
   }
 
   // 1. 추천자 객체 db connect

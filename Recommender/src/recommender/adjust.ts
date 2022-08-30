@@ -13,7 +13,7 @@ function RecommenderAdjust<T extends { new (...args: any[]): Recommender }>(
       return this;
     }
     next() {
-      this.run();
+      // this.run();
       if (
         this.recoTracks.length <= this.MAX_LENGTH &&
         this.recoTracks.length >= this.MIN_LENGTH

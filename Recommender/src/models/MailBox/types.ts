@@ -12,12 +12,27 @@ export type MailBox = {
   updatedAt?: Date;
 };
 
-export type Track = {
-  trackId: string;
-  trackName: string;
-  artistIds: string;
-  artistNames: string;
-  image: string;
+export interface Track {
+  id: string;
+  name: string;
+  artists: Artist[];
+  album: Album;
+  isUse: boolean;
 
-  label?: number;
-};
+  label?: string;
+}
+
+export interface Artist {
+  id: string;
+  name: string;
+}
+
+export interface Album {
+  images: AlbumArt[];
+}
+
+export interface AlbumArt {
+  height: number;
+  url: string;
+  width: number;
+}

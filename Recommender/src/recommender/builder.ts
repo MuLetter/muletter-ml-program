@@ -21,14 +21,14 @@ class RecommenderBuilder {
   // 3. ArtistAndGenres and AudioFeatures, for User
   async step3() {
     await this.recommender.addArtistAndGenres();
-    await this.recommender.addAudioFeatures();
+    // await this.recommender.addAudioFeatures();
   }
 
   // 4. set seed and recommend API Call
   async step4() {
-    this.recommender.addSeeds();
-    await this.recommender.addRecommendations();
-    await this.recommender.addRecoAudioFeatures();
+    // this.recommender.addSeeds();
+    // await this.recommender.addRecommendations();
+    // await this.recommender.addRecoAudioFeatures();
   }
 
   get(): Iterable<Recommender> & Recommender {

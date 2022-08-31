@@ -26,8 +26,8 @@ class RecommenderBuilder {
 
   // 4. set seed and recommend API Call
   async step4() {
-    // this.recommender.addSeeds();
-    // await this.recommender.addRecommendations();
+    this.recommender.addSeeds();
+    await this.recommender.addRecommendations();
     // await this.recommender.addRecoAudioFeatures();
   }
 

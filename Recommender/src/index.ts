@@ -14,9 +14,11 @@ const recommender = builder.get();
     console.log(recommender.spotifyToken);
 
     await builder.step3();
-    console.log(recommender.audioFeatures);
+    // console.log(recommender.artistAndGenres);
+    // console.log(recommender.audioFeatures);
 
-    // await builder.step4();
+    await builder.step4();
+    // console.log(recommender.seeds);
   } catch (err) {
     console.error(err);
   }

@@ -5,14 +5,14 @@ export type Seed = {
   seed_tracks: string;
   seed_artists: string;
   seed_genres: string;
-  seed_danceability: number;
-  seed_energy: number;
-  seed_loudness: number;
-  seed_speechiness: number;
-  seed_acousticness: number;
-  seed_liveness: number;
-  seed_valence: number;
-  seed_tempo: number;
+  target_danceability: number;
+  target_energy: number;
+  target_loudness: number;
+  target_speechiness: number;
+  target_acousticness: number;
+  target_liveness: number;
+  target_valence: number;
+  target_tempo: number;
 };
 
 export type NeedAudioFeautres =

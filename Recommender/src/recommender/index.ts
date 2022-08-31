@@ -133,65 +133,82 @@ class Recommender {
     }
   }
 
-  // async addSeeds() {
-  //   const tracks = this.mailBox?.tracks;
-  //   const artists = this.artistAndGenres;
-  //   const features = this.audioFeatures;
+  async addSeeds() {
+    const tracks = this.mailBox?.tracks;
+    const artists = this.artistAndGenres;
+    const features = this.audioFeatures;
 
-  //   this.seeds = _.map(tracks, (track) => {
-  //     const artist = _.find(artists, (artist) => artist.id === track.artistIds);
-  //     const feature = _.find(
-  //       features,
-  //       (feature) => feature.id === track.trackId
-  //     );
-  //     const seedFeatures = _.reduce(
-  //       Object.keys(feature!),
-  //       (acc, cur) =>
-  //         cur === "id"
-  //           ? acc
-  //           : {
-  //               ...acc,
-  //               [`target_${cur}`]: feature![cur],
-  //             },
-  //       {}
-  //     );
+    this.seeds = _.map(tracks, ({ id: trackId, artists: _artists }) => {
+      const artistIds = _.map(_artists, ({ id }) => id);
+      let genres = _.uniq(
+        _.flatten(
+          _.map(
+            artistIds,
+            (artistId) => _.find(artists, ({ id }) => id === artistId)?.genres
+          )
+        )
+      );
+      const feature = _.find(this.audioFeatures, ({ id }) => id === trackId);
 
-  //     return {
-  //       seed_tracks: track.trackId,
-  //       seed_artists: artist?.id,
-  //       seed_genres: artist?.genres.join(","),
-  //       ...seedFeatures,
-  //     };
-  //   }) as any;
-  // }
+      // max 5 check
+      if (1 + artistIds.length + genres.length > 5) {
+        // track, artist 수량에 집중, 장르는 서브템으로
+        const availableGenreSize = 5 - (1 + artistIds.length);
+        genres = _.sampleSize(genres, availableGenreSize);
+      }
+      const seedArtists = _.join(artistIds, ",");
+      const seedGenres = _.join(genres, ",");
 
-  // async addRecommendations() {
-  //   let recommendations: Track[] = [];
+      const seedFeatures = _.reduce(
+        Object.keys(feature!),
+        (acc, cur) =>
+          cur === "id"
+            ? acc
+            : {
+                ...acc,
+                [`target_${cur}`]: feature![cur],
+              },
+        {}
+      );
 
-  //   try {
-  //     for (let seed of this.seeds!) {
-  //       const resRecommendations = await getRecommendations.call(this, seed);
-  //       const recos = resRecommendations.data.tracks;
+      return {
+        seed_tracks: trackId,
+        seed_artists: seedArtists,
+        seed_genres: seedGenres,
+        ...seedFeatures,
+      };
+    }) as Seed[];
+  }
 
-  //       recommendations = _.concat(
-  //         recommendations,
-  //         _.map(recos, (reco) => ({
-  //           trackId: reco.id,
-  //           trackName: reco.name,
-  //           artistIds: _.map(reco.artists, (artist) => artist.id).join(","),
-  //           artistNames: _.map(reco.artists, (artist) => artist.name).join(","),
-  //           image:
-  //             reco.album.images.length === 0 ? "" : reco.album.images[0].url,
-  //         }))
-  //       );
-  //     }
-  //   } catch (err) {
-  //     console.log(this.spotifyToken);
-  //     console.error(err);
-  //   }
+  async addRecommendations() {
+    let recommendations: Track[] = [];
 
-  //   this.recommendations = _.uniqBy(recommendations, "trackId");
-  // }
+    try {
+      for (let seed of this.seeds!) {
+        const resRecommendations = await getRecommendations.call(this, seed);
+        const recos = resRecommendations.data.tracks;
+
+        console.log(recos);
+
+        // recommendations = _.concat(
+        //   recommendations,
+        //   _.map(recos, (reco) => ({
+        //     trackId: reco.id,
+        //     trackName: reco.name,
+        //     artistIds: _.map(reco.artists, (artist) => artist.id).join(","),
+        //     artistNames: _.map(reco.artists, (artist) => artist.name).join(","),
+        //     image:
+        //       reco.album.images.length === 0 ? "" : reco.album.images[0].url,
+        //   }))
+        // );
+      }
+    } catch (err) {
+      console.log(this.spotifyToken);
+      console.error(err);
+    }
+
+    // this.recommendations = _.uniqBy(recommendations, "trackId");
+  }
 
   // async addRecoAudioFeatures() {
   //   try {

@@ -19,6 +19,7 @@ const recommender = builder.get();
 
     await builder.step4();
     // console.log(recommender.seeds);
+    // console.log(recommender.recommendations);
   } catch (err) {
     console.error(err);
   }

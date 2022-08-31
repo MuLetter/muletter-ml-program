@@ -28,7 +28,7 @@ class RecommenderBuilder {
   async step4() {
     this.recommender.addSeeds();
     await this.recommender.addRecommendations();
-    // await this.recommender.addRecoAudioFeatures();
+    await this.recommender.addRecoAudioFeatures();
   }
 
   get(): Iterable<Recommender> & Recommender {

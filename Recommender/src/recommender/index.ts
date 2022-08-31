@@ -187,39 +187,38 @@ class Recommender {
       for (let seed of this.seeds!) {
         const resRecommendations = await getRecommendations.call(this, seed);
         const recos = resRecommendations.data.tracks;
+        const parsed = _.map(recos, ({ id, name, artists, album }) => ({
+          id,
+          name,
+          artists: _.map(artists, ({ id, name }) => ({
+            id,
+            name,
+          })),
+          album: {
+            images: album.images,
+          },
+        }));
 
-        console.log(recos);
-
-        // recommendations = _.concat(
-        //   recommendations,
-        //   _.map(recos, (reco) => ({
-        //     trackId: reco.id,
-        //     trackName: reco.name,
-        //     artistIds: _.map(reco.artists, (artist) => artist.id).join(","),
-        //     artistNames: _.map(reco.artists, (artist) => artist.name).join(","),
-        //     image:
-        //       reco.album.images.length === 0 ? "" : reco.album.images[0].url,
-        //   }))
-        // );
+        recommendations = _.concat(recommendations, parsed) as Track[];
       }
     } catch (err) {
       console.log(this.spotifyToken);
       console.error(err);
     }
 
-    // this.recommendations = _.uniqBy(recommendations, "trackId");
+    this.recommendations = _.uniqBy(recommendations, "id");
   }
 
-  // async addRecoAudioFeatures() {
-  //   try {
-  //     this.recoAudioFeatures = await new FeaturesGenerator(
-  //       this.recommendations!
-  //     ).generate(this);
-  //   } catch (err) {
-  //     console.log(this.spotifyToken);
-  //     console.error(err);
-  //   }
-  // }
+  async addRecoAudioFeatures() {
+    try {
+      this.recoAudioFeatures = await new FeaturesGenerator(
+        this.recommendations!
+      ).generate(this);
+    } catch (err) {
+      console.log(this.spotifyToken);
+      console.error(err);
+    }
+  }
 
   get mergeAudioFeatures() {
     let mergeAudioFeatures = _.concat(

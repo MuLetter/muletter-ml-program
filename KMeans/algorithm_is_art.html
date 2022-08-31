@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #wrap {
+            display: flex;
+            flex-direction: row;
+            column-gap: 48px;
+
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            margin: auto;
+
+            width: 1048px;
+            height: 580px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+
+            width: 500px;
+            height: 580px;
+        }
+        .scatter {
+            width: 500px;
+            height: 500px;
+
+            /* background-color: #ccc; */
+            overflow: visible;
+        }
+        .buttons {
+            flex: 1;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+    </style>
+</head>
+<body>
+    <div id="wrap">
+        <div class="kmeans container">
+            <p class="ecv"></p>
+            <svg class="scatter kmeans" viewBox="0 0 100 100">
+            </svg>
+            <div class="buttons">
+                <button class="prev">prev</button>
+                <button class="init">init</button>
+                <button class="next">next</button>
+            </div>
+        </div>
+        <div class="kmeans-plus container">
+            <p class="ecv"></p>
+            <svg class="scatter kmeans-plus" viewBox="0 0 100 100">
+            </svg>
+            <div class="buttons">
+                <button class="prev">prev</button>
+                <button class="init">init</button>
+                <button class="next">next</button>
+            </div>
+        </div>
+    </div>
+    <script src="./src/IntegratedWebTest.ts" type="module"></script>
+</body>
+</html>

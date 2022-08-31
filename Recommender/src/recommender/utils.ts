@@ -1,58 +1,50 @@
-// import { getFeatures } from "@api";
-// import { AudioFeature, HasToken } from "@api/types";
+import { getFeatures } from "@api";
+import { AudioFeature, HasToken } from "@api/types";
 // import { euclideanDistance } from "@kmeans/utils";
 // import MinMaxScaler from "@minmax-scaler";
-// import { Track } from "@models/types";
+import { Track } from "@models/types";
 // import Recommender from "@recommender";
 import _ from "lodash";
 // import mongoose from "mongoose";
-// import { NEED_FEATURES } from "./common";
-// import { PartitionData, ProcessAudioFeatures } from "./types";
+import { NEED_FEATURES } from "./common";
+import { ProcessAudioFeatures } from "./types";
 
-// export function parseNeedFeatures(feature: AudioFeature) {
-//   const processAudioFeaturs: ProcessAudioFeatures = {} as any;
-//   for (let parse of NEED_FEATURES) {
-//     (processAudioFeaturs as any)[parse] = feature[parse];
-//   }
+export function parseNeedFeatures(feature: AudioFeature) {
+  const processAudioFeaturs: ProcessAudioFeatures = {} as any;
+  for (let parse of NEED_FEATURES) {
+    (processAudioFeaturs as any)[parse] = feature[parse];
+  }
 
-//   return processAudioFeaturs;
-// }
+  return processAudioFeaturs;
+}
 
-// export class FeaturesGenerator {
-//   datas: Track[];
+export class FeaturesGenerator {
+  datas: Track[];
 
-//   constructor(datas: Track[]) {
-//     this.datas = datas;
-//   }
+  constructor(datas: Track[]) {
+    this.datas = datas;
+  }
 
-//   async generate(hasToken: HasToken) {
-//     let features: ProcessAudioFeatures[] = [];
+  async generate(hasToken: HasToken) {
+    let features: ProcessAudioFeatures[] = [];
 
-//     const trackIds = _.uniq(_.map(this.datas, (track) => track.trackId));
-//     const partitioned = partition(trackIds, 100);
+    const trackIds = _.uniq(_.map(this.datas, ({ id }) => id));
+    const chunked = _.chunk(trackIds, 100);
 
-//     let groupNum = 0;
-//     while (true) {
-//       const filtered = _.filter(
-//         partitioned,
-//         (part) => part.groupNum === groupNum
-//       );
-//       if (filtered.length === 0) break;
-//       const ids = _.map(filtered, (filter) => filter.data).join(",");
+    for (let chunk of chunked) {
+      const ids = _.join(chunk, ",");
 
-//       const res = await getFeatures.call(hasToken, ids);
-//       const audioFeatures = res.data.audio_features;
+      const res = await getFeatures.call(hasToken, ids);
+      const audioFeatures = res.data.audio_features;
 
-//       // 필요로 하는 것만 parsing
-//       const processAudioFeatures = _.map(audioFeatures, parseNeedFeatures);
-//       features = _.concat(features, processAudioFeatures);
+      // 필요로 하는 것만 parsing
+      const processAudioFeatures = _.map(audioFeatures, parseNeedFeatures);
+      features = _.concat(features, processAudioFeatures);
+    }
 
-//       groupNum++;
-//     }
-
-//     return features;
-//   }
-// }
+    return features;
+  }
+}
 
 // export function checkBuildItems(this: Recommender) {
 //   if (mongoose.connection.readyState !== 1)

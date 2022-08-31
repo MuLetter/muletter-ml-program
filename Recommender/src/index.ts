@@ -14,6 +14,7 @@ const recommender = builder.get();
     console.log(recommender.spotifyToken);
 
     await builder.step3();
+    console.log(recommender.audioFeatures);
 
     // await builder.step4();
   } catch (err) {

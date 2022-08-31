@@ -10,7 +10,7 @@ import { Artist, MailBox, Track } from "@models/types";
 import dotenv from "dotenv";
 import { ArtistAndGenres, ProcessAudioFeatures, Seed } from "./types";
 import _ from "lodash";
-// import { FeaturesGenerator } from "./utils";
+import { FeaturesGenerator } from "./utils";
 // import //   checkBuildItems,
 // //   dropTrackByLabelCount,
 //   FeaturesGenerator,
@@ -122,16 +122,16 @@ class Recommender {
     }
   }
 
-  // async addAudioFeatures() {
-  //   try {
-  //     this.audioFeatures = await new FeaturesGenerator(
-  //       this.mailBox!.tracks
-  //     ).generate(this);
-  //   } catch (err) {
-  //     console.log(this.spotifyToken);
-  //     console.error(err);
-  //   }
-  // }
+  async addAudioFeatures() {
+    try {
+      this.audioFeatures = await new FeaturesGenerator(
+        this.mailBox!.tracks
+      ).generate(this);
+    } catch (err) {
+      console.log(this.spotifyToken);
+      console.error(err);
+    }
+  }
 
   // async addSeeds() {
   //   const tracks = this.mailBox?.tracks;

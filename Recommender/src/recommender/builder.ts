@@ -21,7 +21,7 @@ class RecommenderBuilder {
   // 3. ArtistAndGenres and AudioFeatures, for User
   async step3() {
     await this.recommender.addArtistAndGenres();
-    // await this.recommender.addAudioFeatures();
+    await this.recommender.addAudioFeatures();
   }
 
   // 4. set seed and recommend API Call

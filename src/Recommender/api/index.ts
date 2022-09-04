@@ -9,7 +9,7 @@ import {
   ResGetRecommendations,
   ResGetToken,
 } from "./types";
-import { Seed } from "@recommender/types";
+import { Seed } from "../types";
 
 dotenv.config();
 

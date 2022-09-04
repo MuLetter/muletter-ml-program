@@ -1,0 +1,41 @@
+{
+  "name": "muletter-ml-program",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/MuLetter/muletter-ml-program",
+  "author": "formegusto <formegusto@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "npx tsc && node dist"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.0",
+    "@types/axios": "^0.14.0",
+    "@types/dotenv": "^8.2.0",
+    "@types/lodash": "^4.14.182",
+    "@types/module-alias": "^2.0.1",
+    "@types/mongoose": "^5.11.97",
+    "@types/node": "^18.7.3",
+    "@types/qs": "^6.9.7",
+    "babel-plugin-module-resolver": "^4.1.0",
+    "os-browserify": "^0.3.0",
+    "parcel-resolver-ts-base-url": "^1.1.5",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "dotenv": "^16.0.1",
+    "lodash": "^4.17.21",
+    "module-alias": "^2.2.2",
+    "mongoose": "^6.5.2",
+    "parcel": "^2.7.0",
+    "qs": "^6.11.0"
+  },
+  "_moduleAliases": {
+    "@recommender": "dist/recommender",
+    "@kmeans": "dist/kmeans",
+    "@minmax-scaler": "dist/MinMaxScaler"
+  }
+}

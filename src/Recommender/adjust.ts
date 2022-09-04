@@ -1,4 +1,4 @@
-import Recommender from "@recommender";
+import Recommender from ".";
 import { IRecommederAdjust } from "./types";
 
 // Decorater

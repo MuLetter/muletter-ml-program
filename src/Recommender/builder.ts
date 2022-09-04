@@ -1,4 +1,4 @@
-import Recommender from "@recommender";
+import Recommender from ".";
 
 class RecommenderBuilder {
   recommender: Recommender;

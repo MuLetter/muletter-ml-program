@@ -1,7 +1,7 @@
-import KMeans from "./KMeans";
-import MinMaxScaler from "./MinMaxScaler";
+import KMeans from "..";
+import MinMaxScaler from "@minmaxscaler";
 import _ from "lodash";
-import { generateRandomColor } from "./KMeans/utils/styles";
+import { generateRandomColor } from "../utils/styles";
 
 const TESTSIZE = 5000;
 let kmeans: KMeans, kmeansplus: KMeans;

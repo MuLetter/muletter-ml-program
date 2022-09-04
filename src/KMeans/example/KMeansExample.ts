@@ -1,5 +1,5 @@
 import _ from "lodash";
-import KMeans from "./KMeans";
+import KMeans from "..";
 
 let kmeans: KMeans;
 
@@ -50,7 +50,7 @@ function render() {
       circle.setAttribute("cx", member[0].toString());
       circle.setAttribute("cy", member[1].toString());
       circle.setAttribute("r", "2");
-      circle.setAttribute("fill", "#" + kmeans.colors[label]);
+      circle.setAttribute("fill", "#" + kmeans.colors![label]);
 
       elSVG?.appendChild(circle);
     });

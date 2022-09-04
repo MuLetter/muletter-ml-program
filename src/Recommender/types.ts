@@ -1,4 +1,4 @@
-import Recommender from "@recommender";
+import Recommender from ".";
 
 export type Seed = {
   [key: string]: string | number;

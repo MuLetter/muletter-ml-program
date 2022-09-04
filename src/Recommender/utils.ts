@@ -1,9 +1,9 @@
-import { getFeatures } from "@api";
-import { AudioFeature, HasToken } from "@api/types";
+import { getFeatures } from "./api";
+import { AudioFeature, HasToken } from "./api/types";
 import { euclideanDistance } from "@kmeans/utils";
-import MinMaxScaler from "@minmax-scaler";
-import { Track } from "@models/types";
-import Recommender from "@recommender";
+import MinMaxScaler from "@minmaxscaler";
+import { Track } from "./models/types";
+import Recommender from ".";
 import _ from "lodash";
 import mongoose from "mongoose";
 import { NEED_FEATURES } from "./common";

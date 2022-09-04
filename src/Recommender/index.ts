@@ -1,147 +1,374 @@
-// import "module-alias/register";
-// import RecommenderBuilder from "@recommender/builder";
-// import _ from "lodash";
+import {
+  getArtists,
+  getAvailableGenres,
+  getRecommendations,
+  getToken,
+} from "./api";
+import { dbConnect, dbDisconnect } from "./models/connect";
+import { MailBoxModel } from "./models";
+import { Artist, MailBox, Track } from "./models/types";
+import dotenv from "dotenv";
+import { ArtistAndGenres, ProcessAudioFeatures, Seed } from "./types";
+import _ from "lodash";
+import {
+  checkBuildItems,
+  dropTrackByLabelCount,
+  FeaturesGenerator,
+} from "./utils";
+import MinMaxScaler from "@minmaxscaler";
+import KMeans from "@kmeans";
+import RecommenderAdjust from "./adjust";
 
-// const mailBoxId = "630cf87e3d8416941f682257";
-// const builder = new RecommenderBuilder();
-// const recommender = builder.get();
+@RecommenderAdjust
+class Recommender {
+  mailBox?: MailBox;
 
-// (async () => {
-//   try {
-//     await builder.step1();
+  spotifyToken?: string;
+  availableGenres?: string[];
+  artistAndGenres?: ArtistAndGenres[];
+  audioFeatures?: ProcessAudioFeatures[];
+  seeds?: Seed[];
+  recommendations?: Track[];
+  recoAudioFeatures?: ProcessAudioFeatures[];
 
-//     await builder.step2(mailBoxId);
-//     console.log(recommender.spotifyToken);
+  // run processing
+  kmeans?: KMeans;
+  recoIdsAndLabels?: (string | number | undefined)[][];
+  recoTracks: Track[];
 
-//     await builder.step3();
-//     // console.log(recommender.artistAndGenres);
-//     // console.log(recommender.audioFeatures);
+  MIN_LENGTH: number = 80;
+  MAX_LENGTH: number = 100;
 
-//     await builder.step4();
-//     // console.log(recommender.seeds);
-//     // console.log(recommender.recommendations);
-//   } catch (err) {
-//     console.error(err);
-//   }
+  constructor() {
+    this.recoTracks = [];
+    dotenv.config();
+  }
 
-//   for (let reco of recommender) {
-//     console.log(reco);
-//   }
-//   console.log(recommender.recoTracks.length);
-//   console.log(recommender.recoTracks);
+  // db connect
+  async open() {
+    await dbConnect();
+  }
 
-//   // console.log(recommender.recommendations!.length);
-//   // console.log(recommender.recoAudioFeatures!.length);
+  // db close
+  async close() {
+    await dbDisconnect();
+  }
 
-//   // recommender.run2();
-//   // const recoTracks = recommender.recoTracks;
-//   // console.log(recoTracks.length);
+  // add mailbox
+  async addMailBox(id: string) {
+    try {
+      const mailBox = await MailBoxModel.findById(id);
 
-//   // console.log(recommender.recommendations!.length);
-//   // console.log(recommender.recoAudioFeatures!.length);
+      if (mailBox) {
+        this.mailBox = mailBox;
 
-//   // recommender.runKMeans();
-//   // console.log(recommender.kmeans?.labels);
+        const resToken = await getToken();
+        this.spotifyToken = resToken.data.access_token;
+      } else {
+        throw new Error("MailBox Not Found!");
+      }
+    } catch (err) {
+      console.log(this.spotifyToken);
+      console.error(err);
+    }
+  }
 
-//   // recommender.parsingKMeansLabel();
-//   // console.log(recommender.recoIdsAndLabels);
+  async addAvailableGenres() {
+    try {
+      const resAvailableGenres = await getAvailableGenres.call(this);
+      this.availableGenres = resAvailableGenres.data.genres;
+    } catch (err) {
+      console.log(this.spotifyToken);
+      console.error(err);
+    }
+  }
 
-//   // // // saveRecoTracks
-//   // const userIds = _.uniq(
-//   //   _.map(recommender.mailBox?.tracks, ({ trackId }) => trackId)
-//   // );
-//   // const trackIdAndLabels = _.zip(
-//   //   recommender.processIds,
-//   //   recommender.kmeans!.labels
-//   // );
-//   // let userIdsAndLabels = _.filter(trackIdAndLabels, ([id]) =>
-//   //   _.includes(userIds, id)
-//   // );
-//   // let userLabels = _.uniq(_.unzip(userIdsAndLabels)[1]);
+  async addArtistAndGenres() {
+    try {
+      const tracks = this.mailBox?.tracks;
+      let artistsIds: Artist[] | string[] = _.uniqBy(
+        _.flatten(_.map(tracks, (track) => track.artists)),
+        ({ id }) => id
+      );
+      artistsIds = _.map(artistsIds, ({ id }) => id);
+      const chunked = _.chunk(artistsIds, 50);
 
-//   // let recoIdsAndLabels = _.filter(
-//   //   trackIdAndLabels,
-//   //   ([id, label]) => !_.includes(userIds, id) && _.includes(userLabels, label)
-//   // );
-//   // let [recoIds, recoLabels] = _.unzip(recoIdsAndLabels);
+      for (let chunk of chunked) {
+        const ids = _.join(chunk, ",");
+        const resGenres = await getArtists.call(this, ids);
+        const artists = resGenres.data.artists;
 
-//   // // recoTracks
-//   // let recoTracks = _.filter(recommender.recommendations, ({ trackId }) =>
-//   //   recoIds.includes(trackId)
-//   // );
-//   // let recoIdsKeyLabels = _.zipObject(recoIds as string[], recoLabels);
-//   // recoTracks = _.map(recoTracks, (recoTrack) => ({
-//   //   ...recoTrack,
-//   //   label: recoIdsKeyLabels[recoTrack.trackId] as number,
-//   // }));
-//   // console.log(recoIdsKeyLabels);
+        const artistAndGenres = _.map(artists, (artist) => {
+          const _availableGenres = _.filter(artist.genres, (genre) =>
+            this.availableGenres?.includes(genre)
+          );
 
-//   // 지워야 할 경우
-//   // drop RecoItem
-//   // console.log(recoTracks.length);
-//   // recoTracks = dropTrackByLabelCount(
-//   //   recoTracks,
-//   //   recommender.recoAudioFeatures!,
-//   //   recoIdsAndLabels
-//   // );
-//   // console.log(recoTracks.length);
+          return {
+            id: artist.id,
+            genres: _availableGenres.length === 0 ? ["pop"] : _availableGenres,
+          };
+        });
 
-//   // console.log(recommender.recommendations!.length);
-//   // console.log(recommender.recoAudioFeatures!.length);
+        if (this.artistAndGenres)
+          this.artistAndGenres = _.concat(
+            this.artistAndGenres,
+            artistAndGenres
+          ) as any;
+        else this.artistAndGenres = artistAndGenres as ArtistAndGenres[];
+      }
+    } catch (err) {
+      console.log(this.spotifyToken);
+      console.error(err);
+    }
+  }
 
-//   // // filter, real saving
-//   // recoIds = _.map(recoTracks, ({ trackId }) => trackId) as string[];
-//   // const filteredRecommendations = _.filter(
-//   //   recommender.recommendations,
-//   //   ({ trackId }) => !recoIds.includes(trackId)
-//   // );
-//   // const filteredRecoAudioFeatures = _.filter(
-//   //   recommender.recoAudioFeatures,
-//   //   ({ id }) => !recoIds.includes(id)
-//   // );
+  async addAudioFeatures() {
+    try {
+      this.audioFeatures = await new FeaturesGenerator(
+        this.mailBox!.tracks
+      ).generate(this);
+    } catch (err) {
+      console.log(this.spotifyToken);
+      console.error(err);
+    }
+  }
 
-//   // console.log(filteredRecommendations.length);
-//   // console.log(filteredRecoAudioFeatures.length);
+  async addSeeds() {
+    const tracks = this.mailBox?.tracks;
+    const artists = this.artistAndGenres;
+    const features = this.audioFeatures;
 
-//   // console.log(recommender.recoAudioFeatures);
-//   // let recoIdsAndLabels = ?
+    this.seeds = _.map(tracks, ({ id: trackId, artists: _artists }) => {
+      const artistIds = _.map(_artists, ({ id }) => id);
+      let genres = _.uniq(
+        _.flatten(
+          _.map(
+            artistIds,
+            (artistId) => _.find(artists, ({ id }) => id === artistId)?.genres
+          )
+        )
+      );
+      const feature = _.find(this.audioFeatures, ({ id }) => id === trackId);
 
-//   // const trackIdAndLabels = _.zip(recommender.processIds, kmeans.labels);
-//   // console.log(_.groupBy(trackIdAndLabels, ([id, label]) => label));
+      // max 5 check
+      if (1 + artistIds.length + genres.length > 5) {
+        // track, artist 수량에 집중, 장르는 서브템으로
+        const availableGenreSize = 5 - (1 + artistIds.length);
+        genres = _.sampleSize(genres, availableGenreSize);
+      }
+      const seedArtists = _.join(artistIds, ",");
+      const seedGenres = _.join(genres, ",");
 
-//   // 방법 1
-//   // const trackIdAndLabel = _.map(recommender.processIds, (trackId, idx) => ({
-//   //   trackId,
-//   //   label: kmeans.labels![idx],
-//   // }));
-//   // const userTrackIds = _.map(
-//   //   recommender.mailBox?.tracks,
-//   //   (track) => track.trackId
-//   // );
-//   // const userLabels = _.uniq(
-//   //   _.map(
-//   //     _.filter(trackIdAndLabel, ({ trackId }) =>
-//   //       userTrackIds.includes(trackId as string)
-//   //     ),
-//   //     ({ label }) => label
-//   //   )
-//   // );
-//   // console.log(userLabels);
-//   // const parsedRecoIds = _.map(
-//   //   _.filter(
-//   //     trackIdAndLabel,
-//   //     ({ trackId, label }) =>
-//   //       userLabels.includes(label) && !userTrackIds.includes(trackId as string)
-//   //   ),
-//   //   ({ trackId }) => trackId
-//   // );
-//   // console.log(parsedRecoIds);
+      const seedFeatures = _.reduce(
+        Object.keys(feature!),
+        (acc, cur) =>
+          cur === "id"
+            ? acc
+            : {
+                ...acc,
+                [`target_${cur}`]: feature![cur],
+              },
+        {}
+      );
 
-//   // console.log(
-//   //   _.filter(recommender.recommendations, ({ trackId }) =>
-//   //     parsedRecoIds.includes(trackId)
-//   //   )
-//   // );
+      return {
+        seed_tracks: trackId,
+        seed_artists: seedArtists,
+        seed_genres: seedGenres,
+        ...seedFeatures,
+      };
+    }) as Seed[];
+  }
 
-//   recommender.close();
-// })();
+  async addRecommendations() {
+    let recommendations: Track[] = [];
+
+    try {
+      for (let seed of this.seeds!) {
+        const resRecommendations = await getRecommendations.call(this, seed);
+        const recos = resRecommendations.data.tracks;
+        const parsed = _.map(recos, ({ id, name, artists, album }) => ({
+          id,
+          name,
+          artists: _.map(artists, ({ id, name }) => ({
+            id,
+            name,
+          })),
+          album: {
+            images: album.images,
+          },
+        }));
+
+        recommendations = _.concat(recommendations, parsed) as Track[];
+      }
+    } catch (err) {
+      console.log(this.spotifyToken);
+      console.error(err);
+    }
+
+    this.recommendations = _.uniqBy(recommendations, "id");
+  }
+
+  async addRecoAudioFeatures() {
+    try {
+      this.recoAudioFeatures = await new FeaturesGenerator(
+        this.recommendations!
+      ).generate(this);
+    } catch (err) {
+      console.log(this.spotifyToken);
+      console.error(err);
+    }
+  }
+
+  get mergeAudioFeatures() {
+    let mergeAudioFeatures = _.concat(
+      this.audioFeatures,
+      this.recoAudioFeatures
+    );
+
+    return _.uniqBy(mergeAudioFeatures, "id");
+  }
+
+  get processIds() {
+    return _.map(this.mergeAudioFeatures, (feature) => _.values(feature)[0]);
+  }
+
+  get processDatas() {
+    return _.map(this.mergeAudioFeatures, (feature) =>
+      _.tail(_.values(feature))
+    );
+  }
+
+  run = () => {
+    this.runKMeans();
+    let recoTracks = this.labelParsing();
+
+    // 수량 조정 - 제거
+    let recoIdsAndLabels = this.getRecoIdsAndLabels();
+    while (this.recoTracks.length + recoTracks.length > this.MAX_LENGTH) {
+      recoTracks = dropTrackByLabelCount(
+        recoTracks,
+        this.recoAudioFeatures!,
+        _.zip.apply(null, recoIdsAndLabels) as any
+      );
+      // console.log(recoTracks.length);
+      recoIdsAndLabels = this.getRecoIdsAndLabels(recoTracks);
+    }
+
+    // 수량 조정 - 제거
+    this.save(recoTracks);
+  };
+
+  save = (recoTracks: Track[]) => {
+    this.recoTracks = _.concat(this.recoTracks, recoTracks);
+    const recoIds = _.map(recoTracks, ({ id }) => id) as string[];
+    this.recommendations = _.filter(
+      this.recommendations,
+      ({ id }) => !recoIds.includes(id)
+    );
+    this.recoAudioFeatures = _.filter(
+      this.recoAudioFeatures,
+      ({ id }) => !recoIds.includes(id)
+    );
+  };
+
+  // label 있는 track 이어야 함
+  getRecoIdsAndLabels = (recoTracks?: Track[]) => {
+    if (recoTracks) {
+      let recoIdsAndLabels = _.map(recoTracks, ({ id, label }) => [id, label]);
+      recoIdsAndLabels = _.unzip(recoIdsAndLabels);
+      return recoIdsAndLabels;
+    } else {
+      const userIds = _.uniq(_.map(this.mailBox?.tracks, ({ id }) => id));
+      const trackIdAndLabels = _.zip(this.processIds, this.kmeans!.labels);
+      let userIdsAndLabels = _.filter(trackIdAndLabels, ([id]) =>
+        _.includes(userIds, id)
+      );
+      let userLabels = _.uniq(_.unzip(userIdsAndLabels)[1]);
+
+      let recoIdsAndLabels = _.filter(
+        trackIdAndLabels,
+        ([id, label]) =>
+          !_.includes(userIds, id) && _.includes(userLabels, label)
+      );
+      recoIdsAndLabels = _.unzip(recoIdsAndLabels);
+
+      return recoIdsAndLabels;
+    }
+  };
+
+  labelParsing = () => {
+    let isSaving = false;
+
+    const [recoIds] = this.getRecoIdsAndLabels();
+
+    // recoTracks
+    let recoTracks = _.filter(this.recommendations, ({ id }) =>
+      recoIds.includes(id)
+    );
+
+    // 수량 조정 - 제거
+    // if (this.recoTracks.length + recoTracks.length > 50) {
+    //   isSaving = false;
+    //   return {
+    //     isSaving,
+    //     recoTracks,
+    //   };
+    // }
+
+    return recoTracks;
+    // if (this.recoTracks.length + recoTracks.length > this.MAX_LENGTH) {
+    //   isSaving = false;
+    //   return {
+    //     isSaving,
+    //     recoTracks,
+    //   };
+    // } else {
+    //   isSaving = true;
+    //   return {
+    //     isSaving,
+    //     recoTracks,
+    //   };
+    // }
+    // let recoIdsKeyLabels = _.zipObject(recoIds as string[], recoLabels);
+    // recoTracks = _.map(recoTracks, (recoTrack) => ({
+    //   ...recoTrack,
+    //   label: recoIdsKeyLabels[recoTrack.trackId] as number,
+    // }));
+    // console.log(recoIdsKeyLabels);
+  };
+
+  runKMeans = () => {
+    checkBuildItems.call(this);
+
+    // 1. min-max scaling
+    const scaler = new MinMaxScaler(this.processDatas as number[][]);
+    const datas = scaler.fit().transfrom();
+
+    // 2. KMeans Run
+    const kmeans = new KMeans(datas);
+    kmeans.setCentroids(2);
+    do {
+      kmeans.next();
+    } while (!kmeans.done);
+
+    this.kmeans = kmeans;
+  };
+
+  parsingKMeansLabel = () => {
+    const userIds = _.uniq(_.map(this.mailBox?.tracks, ({ id }) => id));
+    const trackIdAndLabels = _.zip(this.processIds, this.kmeans!.labels);
+    let userIdsAndLabels = _.filter(trackIdAndLabels, ([id]) =>
+      _.includes(userIds, id)
+    );
+    let userLabels = _.uniq(_.unzip(userIdsAndLabels)[1]);
+    let recoIdsAndLabels = _.filter(
+      trackIdAndLabels,
+      ([id, label]) => !_.includes(userIds, id) && _.includes(userLabels, label)
+    );
+
+    this.recoIdsAndLabels = recoIdsAndLabels;
+  };
+}
+
+export default Recommender;

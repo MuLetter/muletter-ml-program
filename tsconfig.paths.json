@@ -7,6 +7,12 @@
             ],
             "@kmeans/*": [
                 "./KMeans/*"
+            ],
+            "@minmaxscaler": [
+                "./MinMaxScaler"
+            ],
+            "@minmaxscaler/*": [
+                "./MinMaxScaler/*"
             ]
         }
     }

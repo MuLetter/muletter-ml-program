@@ -1,5 +1,5 @@
 import _ from "lodash";
-import MinMaxScaler from "./MinMaxScaler";
+import MinMaxScaler from "@minmaxscaler";
 
 // 1. data setting
 const TESTSIZE = 50;

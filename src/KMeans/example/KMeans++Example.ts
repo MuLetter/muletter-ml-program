@@ -1,5 +1,5 @@
 import _ from "lodash";
-import KMeans from "./KMeans";
+import KMeans from "..";
 
 // 1. data setting
 const TESTSIZE = 50;

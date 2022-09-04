@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./src",
+        "paths": {
+            "@kmeans": [
+                "./KMeans"
+            ],
+            "@kmeans/*": [
+                "./KMeans/*"
+            ]
+        }
+    }
+}

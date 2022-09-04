@@ -6,7 +6,7 @@ import {
 } from "./api";
 import { dbConnect, dbDisconnect } from "./models/connect";
 import { MailBoxModel } from "./models";
-import { Artist, MailBox, Track } from "./models/types";
+import { Artist, IMailBox, Mail, Track } from "./models/types";
 import dotenv from "dotenv";
 import { ArtistAndGenres, ProcessAudioFeatures, Seed } from "./types";
 import _ from "lodash";
@@ -21,7 +21,7 @@ import RecommenderAdjust from "./adjust";
 
 @RecommenderAdjust
 class Recommender {
-  mailBox?: MailBox;
+  mailBox?: IMailBox;
 
   spotifyToken?: string;
   availableGenres?: string[];
@@ -369,6 +369,19 @@ class Recommender {
 
     this.recoIdsAndLabels = recoIdsAndLabels;
   };
+
+  async saveDB() {
+    const TITLENAMESIZE = 2;
+    const title1 = _.join(
+      _.map(_.take(this.recoTracks, TITLENAMESIZE), ({ name }) => name),
+      ","
+    );
+    const title2 = `외 ${this.recoTracks.length - TITLENAMESIZE}개의 노래`;
+    const title = `${title1} ${title2}`;
+
+    const mail = new Mail(title, this.recoTracks, this.mailBox!._id);
+    return await mail.save();
+  }
 }
 
 export default Recommender;

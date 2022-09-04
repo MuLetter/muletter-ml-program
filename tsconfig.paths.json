@@ -13,6 +13,12 @@
             ],
             "@minmaxscaler/*": [
                 "./MinMaxScaler/*"
+            ],
+            "@recommender": [
+                "./Recommender"
+            ],
+            "@recommender/*": [
+                "./Recommender/*"
             ]
         }
     }

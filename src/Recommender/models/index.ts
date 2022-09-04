@@ -1,1 +1,2 @@
-export * from "./MailBox/index";
+export * from "./MailBox";
+export * from "./Mail";

@@ -1,7 +1,7 @@
 import { model, Schema } from "mongoose";
-import { MailBox } from "./types";
+import { IMailBox } from "./types";
 
-const MailBoxSchema = new Schema<MailBox>(
+const MailBoxSchema = new Schema<IMailBox>(
   {
     title: { type: String, required: true },
     description: { type: String, required: true },
@@ -14,4 +14,4 @@ const MailBoxSchema = new Schema<MailBox>(
   }
 );
 
-export const MailBoxModel = model<MailBox>("MailBox", MailBoxSchema);
+export const MailBoxModel = model<IMailBox>("MailBox", MailBoxSchema);

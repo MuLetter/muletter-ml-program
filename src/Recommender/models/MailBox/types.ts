@@ -1,6 +1,6 @@
 import { Schema } from "mongoose";
 
-export type MailBox = {
+export type IMailBox = {
   _id?: Schema.Types.ObjectId;
 
   title: string;

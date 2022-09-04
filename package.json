@@ -34,8 +34,8 @@
     "qs": "^6.11.0"
   },
   "_moduleAliases": {
-    "@recommender": "dist/recommender",
-    "@kmeans": "dist/kmeans",
-    "@minmax-scaler": "dist/MinMaxScaler"
+    "@recommender": "dist/Recommender",
+    "@kmeans": "dist/KMeans",
+    "@minmaxscaler": "dist/MinMaxScaler"
   }
 }

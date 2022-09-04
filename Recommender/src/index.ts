@@ -24,10 +24,11 @@ const recommender = builder.get();
     console.error(err);
   }
 
-  // for (let reco of recommender) {
-  //   // console.log(reco);
-  // }
-  // console.log(recommender.recoTracks.length);
+  for (let reco of recommender) {
+    console.log(reco);
+  }
+  console.log(recommender.recoTracks.length);
+  console.log(recommender.recoTracks);
 
   // console.log(recommender.recommendations!.length);
   // console.log(recommender.recoAudioFeatures!.length);

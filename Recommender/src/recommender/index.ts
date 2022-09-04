@@ -10,11 +10,11 @@ import { Artist, MailBox, Track } from "@models/types";
 import dotenv from "dotenv";
 import { ArtistAndGenres, ProcessAudioFeatures, Seed } from "./types";
 import _ from "lodash";
-import { FeaturesGenerator } from "./utils";
-// import //   checkBuildItems,
-// //   dropTrackByLabelCount,
-//   FeaturesGenerator,
-// from "./utils";
+import {
+  checkBuildItems,
+  dropTrackByLabelCount,
+  FeaturesGenerator,
+} from "./utils";
 import MinMaxScaler from "@minmax-scaler";
 import KMeans from "@kmeans";
 import RecommenderAdjust from "./adjust";
@@ -239,143 +239,136 @@ class Recommender {
     );
   }
 
-  // run = () => {
-  //   this.runKMeans();
-  //   let recoTracks = this.labelParsing();
+  run = () => {
+    this.runKMeans();
+    let recoTracks = this.labelParsing();
 
-  //   // 수량 조정 - 제거
-  //   let recoIdsAndLabels = this.getRecoIdsAndLabels();
-  //   while (this.recoTracks.length + recoTracks.length > this.MAX_LENGTH) {
-  //     recoTracks = dropTrackByLabelCount(
-  //       recoTracks,
-  //       this.recoAudioFeatures!,
-  //       _.zip.apply(null, recoIdsAndLabels) as any
-  //     );
-  //     // console.log(recoTracks.length);
-  //     recoIdsAndLabels = this.getRecoIdsAndLabels(recoTracks);
-  //   }
+    // 수량 조정 - 제거
+    let recoIdsAndLabels = this.getRecoIdsAndLabels();
+    while (this.recoTracks.length + recoTracks.length > this.MAX_LENGTH) {
+      recoTracks = dropTrackByLabelCount(
+        recoTracks,
+        this.recoAudioFeatures!,
+        _.zip.apply(null, recoIdsAndLabels) as any
+      );
+      // console.log(recoTracks.length);
+      recoIdsAndLabels = this.getRecoIdsAndLabels(recoTracks);
+    }
 
-  //   // 수량 조정 - 제거
-  //   this.save(recoTracks);
-  // };
+    // 수량 조정 - 제거
+    this.save(recoTracks);
+  };
 
-  // save = (recoTracks: Track[]) => {
-  //   this.recoTracks = _.concat(this.recoTracks, recoTracks);
-  //   const recoIds = _.map(recoTracks, ({ trackId }) => trackId) as string[];
-  //   this.recommendations = _.filter(
-  //     this.recommendations,
-  //     ({ trackId }) => !recoIds.includes(trackId)
-  //   );
-  //   this.recoAudioFeatures = _.filter(
-  //     this.recoAudioFeatures,
-  //     ({ id }) => !recoIds.includes(id)
-  //   );
-  // };
+  save = (recoTracks: Track[]) => {
+    this.recoTracks = _.concat(this.recoTracks, recoTracks);
+    const recoIds = _.map(recoTracks, ({ id }) => id) as string[];
+    this.recommendations = _.filter(
+      this.recommendations,
+      ({ id }) => !recoIds.includes(id)
+    );
+    this.recoAudioFeatures = _.filter(
+      this.recoAudioFeatures,
+      ({ id }) => !recoIds.includes(id)
+    );
+  };
 
-  // label 잇는 track 이어야 함
-  // getRecoIdsAndLabels = (recoTracks?: Track[]) => {
-  //   if (recoTracks) {
-  //     let recoIdsAndLabels = _.map(recoTracks, ({ trackId, label }) => [
-  //       trackId,
-  //       label,
-  //     ]);
-  //     recoIdsAndLabels = _.unzip(recoIdsAndLabels);
-  //     return recoIdsAndLabels;
-  //   } else {
-  //     const userIds = _.uniq(
-  //       _.map(this.mailBox?.tracks, ({ trackId }) => trackId)
-  //     );
-  //     const trackIdAndLabels = _.zip(this.processIds, this.kmeans!.labels);
-  //     let userIdsAndLabels = _.filter(trackIdAndLabels, ([id]) =>
-  //       _.includes(userIds, id)
-  //     );
-  //     let userLabels = _.uniq(_.unzip(userIdsAndLabels)[1]);
+  // label 있는 track 이어야 함
+  getRecoIdsAndLabels = (recoTracks?: Track[]) => {
+    if (recoTracks) {
+      let recoIdsAndLabels = _.map(recoTracks, ({ id, label }) => [id, label]);
+      recoIdsAndLabels = _.unzip(recoIdsAndLabels);
+      return recoIdsAndLabels;
+    } else {
+      const userIds = _.uniq(_.map(this.mailBox?.tracks, ({ id }) => id));
+      const trackIdAndLabels = _.zip(this.processIds, this.kmeans!.labels);
+      let userIdsAndLabels = _.filter(trackIdAndLabels, ([id]) =>
+        _.includes(userIds, id)
+      );
+      let userLabels = _.uniq(_.unzip(userIdsAndLabels)[1]);
 
-  //     let recoIdsAndLabels = _.filter(
-  //       trackIdAndLabels,
-  //       ([id, label]) =>
-  //         !_.includes(userIds, id) && _.includes(userLabels, label)
-  //     );
-  //     recoIdsAndLabels = _.unzip(recoIdsAndLabels);
+      let recoIdsAndLabels = _.filter(
+        trackIdAndLabels,
+        ([id, label]) =>
+          !_.includes(userIds, id) && _.includes(userLabels, label)
+      );
+      recoIdsAndLabels = _.unzip(recoIdsAndLabels);
 
-  //     return recoIdsAndLabels;
-  //   }
-  // };
+      return recoIdsAndLabels;
+    }
+  };
 
-  // labelParsing = () => {
-  //   let isSaving = false;
+  labelParsing = () => {
+    let isSaving = false;
 
-  //   const [recoIds] = this.getRecoIdsAndLabels();
+    const [recoIds] = this.getRecoIdsAndLabels();
 
-  //   // recoTracks
-  //   let recoTracks = _.filter(this.recommendations, ({ trackId }) =>
-  //     recoIds.includes(trackId)
-  //   );
+    // recoTracks
+    let recoTracks = _.filter(this.recommendations, ({ id }) =>
+      recoIds.includes(id)
+    );
 
-  //   // 수량 조정 - 제거
-  //   // if (this.recoTracks.length + recoTracks.length > 50) {
-  //   //   isSaving = false;
-  //   //   return {
-  //   //     isSaving,
-  //   //     recoTracks,
-  //   //   };
-  //   // }
+    // 수량 조정 - 제거
+    // if (this.recoTracks.length + recoTracks.length > 50) {
+    //   isSaving = false;
+    //   return {
+    //     isSaving,
+    //     recoTracks,
+    //   };
+    // }
 
-  //   return recoTracks;
-  //   // if (this.recoTracks.length + recoTracks.length > this.MAX_LENGTH) {
-  //   //   isSaving = false;
-  //   //   return {
-  //   //     isSaving,
-  //   //     recoTracks,
-  //   //   };
-  //   // } else {
-  //   //   isSaving = true;
-  //   //   return {
-  //   //     isSaving,
-  //   //     recoTracks,
-  //   //   };
-  //   // }
-  //   // let recoIdsKeyLabels = _.zipObject(recoIds as string[], recoLabels);
-  //   // recoTracks = _.map(recoTracks, (recoTrack) => ({
-  //   //   ...recoTrack,
-  //   //   label: recoIdsKeyLabels[recoTrack.trackId] as number,
-  //   // }));
-  //   // console.log(recoIdsKeyLabels);
-  // };
+    return recoTracks;
+    // if (this.recoTracks.length + recoTracks.length > this.MAX_LENGTH) {
+    //   isSaving = false;
+    //   return {
+    //     isSaving,
+    //     recoTracks,
+    //   };
+    // } else {
+    //   isSaving = true;
+    //   return {
+    //     isSaving,
+    //     recoTracks,
+    //   };
+    // }
+    // let recoIdsKeyLabels = _.zipObject(recoIds as string[], recoLabels);
+    // recoTracks = _.map(recoTracks, (recoTrack) => ({
+    //   ...recoTrack,
+    //   label: recoIdsKeyLabels[recoTrack.trackId] as number,
+    // }));
+    // console.log(recoIdsKeyLabels);
+  };
 
-  // runKMeans = () => {
-  //   checkBuildItems.call(this);
+  runKMeans = () => {
+    checkBuildItems.call(this);
 
-  //   // 1. min-max scaling
-  //   const scaler = new MinMaxScaler(this.processDatas as number[][]);
-  //   const datas = scaler.fit().transfrom();
+    // 1. min-max scaling
+    const scaler = new MinMaxScaler(this.processDatas as number[][]);
+    const datas = scaler.fit().transfrom();
 
-  //   // 2. KMeans Run
-  //   const kmeans = new KMeans(datas);
-  //   kmeans.setCentroids(2);
-  //   do {
-  //     kmeans.next();
-  //   } while (!kmeans.done);
+    // 2. KMeans Run
+    const kmeans = new KMeans(datas);
+    kmeans.setCentroids(2);
+    do {
+      kmeans.next();
+    } while (!kmeans.done);
 
-  //   this.kmeans = kmeans;
-  // };
+    this.kmeans = kmeans;
+  };
 
-  // parsingKMeansLabel = () => {
-  //   const userIds = _.uniq(
-  //     _.map(this.mailBox?.tracks, ({ trackId }) => trackId)
-  //   );
-  //   const trackIdAndLabels = _.zip(this.processIds, this.kmeans!.labels);
-  //   let userIdsAndLabels = _.filter(trackIdAndLabels, ([id]) =>
-  //     _.includes(userIds, id)
-  //   );
-  //   let userLabels = _.uniq(_.unzip(userIdsAndLabels)[1]);
-  //   let recoIdsAndLabels = _.filter(
-  //     trackIdAndLabels,
-  //     ([id, label]) => !_.includes(userIds, id) && _.includes(userLabels, label)
-  //   );
+  parsingKMeansLabel = () => {
+    const userIds = _.uniq(_.map(this.mailBox?.tracks, ({ id }) => id));
+    const trackIdAndLabels = _.zip(this.processIds, this.kmeans!.labels);
+    let userIdsAndLabels = _.filter(trackIdAndLabels, ([id]) =>
+      _.includes(userIds, id)
+    );
+    let userLabels = _.uniq(_.unzip(userIdsAndLabels)[1]);
+    let recoIdsAndLabels = _.filter(
+      trackIdAndLabels,
+      ([id, label]) => !_.includes(userIds, id) && _.includes(userLabels, label)
+    );
 
-  //   this.recoIdsAndLabels = recoIdsAndLabels;
-  // };
+    this.recoIdsAndLabels = recoIdsAndLabels;
+  };
 }
 
 export default Recommender;

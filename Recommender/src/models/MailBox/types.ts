@@ -19,7 +19,7 @@ export interface Track {
   album: Album;
   isUse: boolean;
 
-  label?: string;
+  label?: number;
 }
 
 export interface Artist {

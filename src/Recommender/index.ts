@@ -1,12 +1,6 @@
-import {
-  getArtists,
-  getAvailableGenres,
-  getRecommendations,
-  getToken,
-} from "./api";
+import { getArtists, getAvailableGenres, getRecommendations } from "./api";
 import { dbConnect, dbDisconnect } from "./models/connect";
-import { MailBoxModel } from "./models";
-import { Artist, IMailBox, Mail, Track } from "./models/types";
+import { Artist, Mail, MailBox, Track } from "./models/types";
 import dotenv from "dotenv";
 import { ArtistAndGenres, ProcessAudioFeatures, Seed } from "./types";
 import _ from "lodash";
@@ -21,7 +15,7 @@ import RecommenderAdjust from "./adjust";
 
 @RecommenderAdjust
 class Recommender {
-  mailBox?: IMailBox;
+  mailBox?: MailBox;
 
   spotifyToken?: string;
   availableGenres?: string[];
@@ -57,18 +51,10 @@ class Recommender {
   // add mailbox
   async addMailBox(id: string) {
     try {
-      const mailBox = await MailBoxModel.findById(id);
-
-      if (mailBox) {
-        this.mailBox = mailBox;
-
-        const resToken = await getToken();
-        this.spotifyToken = resToken.data.access_token;
-      } else {
-        throw new Error("MailBox Not Found!");
-      }
+      const mailBox = await MailBox.getById(id, true);
+      this.mailBox = mailBox;
+      this.spotifyToken = mailBox.spotifyToken!;
     } catch (err) {
-      console.log(this.spotifyToken);
       console.error(err);
     }
   }

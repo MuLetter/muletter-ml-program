@@ -1,7 +1,10 @@
+import { getToken } from "../../api";
 import { Schema } from "mongoose";
+import { MailBoxModel } from ".";
+import { Track } from "../types";
 
 export type IMailBox = {
-  _id?: Schema.Types.ObjectId;
+  _id?: Schema.Types.ObjectId | string;
 
   title: string;
   description: string;
@@ -12,27 +15,62 @@ export type IMailBox = {
   updatedAt?: Date;
 };
 
-export interface Track {
-  id: string;
-  name: string;
-  artists: Artist[];
-  album: Album;
-  isUse: boolean;
+export class MailBox implements IMailBox {
+  _id?: Schema.Types.ObjectId | string;
 
-  label?: number;
-}
+  title: string;
+  description: string;
+  imagePath?: string;
+  tracks: Track[];
 
-export interface Artist {
-  id: string;
-  name: string;
-}
+  // mailCount : number
 
-export interface Album {
-  images: AlbumArt[];
-}
+  createdAt?: Date;
+  updatedAt?: Date;
 
-export interface AlbumArt {
-  height: number;
-  url: string;
-  width: number;
+  spotifyToken?: string;
+
+  constructor(
+    title: string,
+    description: string,
+    tracks: Track[],
+    _id?: Schema.Types.ObjectId | string,
+    imagePath?: string
+  ) {
+    this.title = title;
+    this.description = description;
+    this.tracks = tracks;
+    this._id = _id;
+    this.imagePath = imagePath;
+  }
+
+  async setSpotifyToken() {
+    const resToken = await getToken();
+    this.spotifyToken = resToken.data.access_token;
+  }
+
+  static getFromDocs(mailBox: IMailBox) {
+    return new MailBox(
+      mailBox.title,
+      mailBox.description,
+      mailBox.tracks,
+      mailBox._id,
+      mailBox.imagePath
+    );
+  }
+
+  static async getById(
+    id: Schema.Types.ObjectId | string,
+    setSpotify?: boolean
+  ) {
+    const mailBoxDoc = await MailBoxModel.findById(id);
+    if (!mailBoxDoc) {
+      throw new Error("MailBox Not Found!");
+    }
+    const mailBox = MailBox.getFromDocs(mailBoxDoc);
+
+    if (setSpotify) await mailBox.setSpotifyToken();
+
+    return mailBox;
+  }
 }

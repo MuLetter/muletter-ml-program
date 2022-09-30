@@ -30,7 +30,7 @@ class Recommender {
   recoIdsAndLabels?: (string | number | undefined)[][];
   recoTracks: Track[];
 
-  MIN_LENGTH: number = 80;
+  MIN_LENGTH: number = 30;
   MAX_LENGTH: number = 100;
 
   constructor() {
@@ -125,7 +125,7 @@ class Recommender {
     const features = this.audioFeatures;
 
     this.seeds = _.map(tracks, ({ id: trackId, artists: _artists }) => {
-      const artistIds = _.map(_artists, ({ id }) => id);
+      let artistIds = _.map(_artists, ({ id }) => id);
       let genres = _.uniq(
         _.flatten(
           _.map(
@@ -134,13 +134,19 @@ class Recommender {
           )
         )
       );
-      const feature = _.find(this.audioFeatures, ({ id }) => id === trackId);
+      const feature = _.find(features, ({ id }) => id === trackId);
 
       // max 5 check
-      if (1 + artistIds.length + genres.length > 5) {
-        // track, artist 수량에 집중, 장르는 서브템으로
-        const availableGenreSize = 5 - (1 + artistIds.length);
-        genres = _.sampleSize(genres, availableGenreSize);
+      while (true) {
+        if (1 + artistIds.length + genres.length > 5) {
+          // track, artist 수량에 집중, 장르는 서브템으로
+          if (genres.length === 1) {
+            const newArtistsSize = 5 - (1 + genres.length);
+            artistIds = _.sampleSize(artistIds, newArtistsSize);
+          } else {
+            genres = _.drop(_.shuffle(genres));
+          }
+        } else break;
       }
       const seedArtists = _.join(artistIds, ",");
       const seedGenres = _.join(genres, ",");
@@ -365,7 +371,7 @@ class Recommender {
     const title2 = `외 ${this.recoTracks.length - TITLENAMESIZE}개의 노래`;
     const title = `${title1} ${title2}`;
 
-    const mail = new Mail(title, this.recoTracks, this.mailBox!._id);
+    const mail = new Mail(title, _.shuffle(this.recoTracks), this.mailBox!._id);
     return await mail.save();
   }
 }

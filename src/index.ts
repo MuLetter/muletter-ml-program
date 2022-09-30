@@ -1,7 +1,7 @@
 import "module-alias/register";
 import RecommenderBuilder from "@recommender/builder";
 
-const mailBoxId = "630cf87e3d8416941f682257";
+const mailBoxId = "63366ea6071259d5a3385f87";
 const builder = new RecommenderBuilder();
 const recommender = builder.get();
 
@@ -22,8 +22,8 @@ const recommender = builder.get();
   console.log(recommender.recoTracks.length);
   console.log(recommender.recoTracks);
 
-  const mail = await recommender.saveDB();
-  console.log(mail);
+  // const mail = await recommender.saveDB();
+  // console.log(mail);
 
   recommender.close();
 })();

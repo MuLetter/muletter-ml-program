@@ -382,6 +382,8 @@ class Recommender {
 
   async okay() {
     const res = await writeOKAY(this.mailBox!._id!);
+    console.log(res.data);
+    this.close();
   }
 }
 

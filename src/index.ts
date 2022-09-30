@@ -24,6 +24,4 @@ const recommender = builder.get();
   // console.log(mail);
 
   await recommender.okay();
-
-  recommender.close();
 })();

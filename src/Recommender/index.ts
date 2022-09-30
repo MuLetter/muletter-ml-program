@@ -1,4 +1,9 @@
-import { getArtists, getAvailableGenres, getRecommendations } from "./api";
+import {
+  getArtists,
+  getAvailableGenres,
+  getRecommendations,
+  writeOKAY,
+} from "./api";
 import { dbConnect, dbDisconnect } from "./models/connect";
 import { Artist, Mail, MailBox, Track } from "./models/types";
 import dotenv from "dotenv";
@@ -373,6 +378,10 @@ class Recommender {
 
     const mail = new Mail(title, _.shuffle(this.recoTracks), this.mailBox!._id);
     return await mail.save();
+  }
+
+  async okay() {
+    const res = await writeOKAY(this.mailBox!._id!);
   }
 }
 

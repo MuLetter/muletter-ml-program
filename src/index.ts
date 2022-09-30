@@ -16,14 +16,14 @@ const recommender = builder.get();
     console.error(err);
   }
 
-  for (let reco of recommender) {
-    console.log(reco);
-  }
+  for (let reco of recommender);
   console.log(recommender.recoTracks.length);
   console.log(recommender.recoTracks);
 
   // const mail = await recommender.saveDB();
   // console.log(mail);
+
+  await recommender.okay();
 
   recommender.close();
 })();

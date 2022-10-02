@@ -20,6 +20,7 @@ const recommender = builder.get();
   console.log(recommender.recoTracks.length);
   console.log(recommender.recoTracks);
 
+  await recommender.isUseUpdate();
   // const mail = await recommender.saveDB();
   // console.log(mail);
 

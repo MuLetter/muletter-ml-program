@@ -2,6 +2,7 @@ import { getToken } from "../../api";
 import { Schema } from "mongoose";
 import { MailBoxModel } from ".";
 import { Track } from "../types";
+import _ from "lodash";
 
 export type IMailBox = {
   _id?: Schema.Types.ObjectId | string;
@@ -72,5 +73,16 @@ export class MailBox implements IMailBox {
     if (setSpotify) await mailBox.setSpotifyToken();
 
     return mailBox;
+  }
+
+  async isUseUpdate() {
+    await MailBoxModel.updateOne(
+      { _id: this._id },
+      {
+        $set: {
+          tracks: _.map(this.tracks, (track) => ({ ...track, isUse: true })),
+        },
+      }
+    );
   }
 }

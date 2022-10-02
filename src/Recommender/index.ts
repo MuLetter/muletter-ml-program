@@ -53,11 +53,19 @@ class Recommender {
     await dbDisconnect();
   }
 
+  async isUseUpdate() {
+    await this.mailBox!.isUseUpdate();
+  }
+
   // add mailbox
   async addMailBox(id: string) {
     try {
       const mailBox = await MailBox.getById(id, true);
       this.mailBox = mailBox;
+      this.mailBox.tracks = _.filter(
+        this.mailBox.tracks,
+        ({ isUse }) => !isUse
+      );
       this.spotifyToken = mailBox.spotifyToken!;
     } catch (err) {
       console.error(err);

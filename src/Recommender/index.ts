@@ -62,10 +62,13 @@ class Recommender {
     try {
       const mailBox = await MailBox.getById(id, true);
       this.mailBox = mailBox;
+
       this.mailBox.tracks = _.filter(
         this.mailBox.tracks,
         ({ isUse }) => !isUse
       );
+
+      console.log(this.mailBox.tracks);
       this.spotifyToken = mailBox.spotifyToken!;
     } catch (err) {
       console.error(err);

@@ -8,6 +8,7 @@ import _ from "lodash";
 import mongoose from "mongoose";
 import { NEED_FEATURES } from "./common";
 import { ProcessAudioFeatures } from "./types";
+import { SeedZoneObserver } from "../SeedzoneObserver";
 
 export function parseNeedFeatures(feature: AudioFeature) {
   const processAudioFeaturs: ProcessAudioFeatures = {} as any;
@@ -42,6 +43,7 @@ export class FeaturesGenerator {
       features = _.concat(features, processAudioFeatures);
     }
 
+    await SeedZoneObserver.append(features);
     return features;
   }
 }

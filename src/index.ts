@@ -1,15 +1,33 @@
 import "module-alias/register";
 import RecommenderBuilder from "@recommender/builder";
+import { SeedZoneObserver } from "./SeedzoneObserver";
+import _ from "lodash";
+import MinMaxScaler from "@minmaxscaler";
+import KMeans from "@kmeans";
 
 const mailBoxId = "633abccf965295f042519aa4";
 const builder = new RecommenderBuilder();
 const recommender = builder.get();
 
 (async () => {
+  await SeedZoneObserver.open();
+
+  const sObs = await SeedZoneObserver.init();
+  const scaler = new MinMaxScaler(sObs.processDatas as number[][]);
+  const datas = scaler.fit().transfrom();
+  const kmeans = new KMeans(datas);
+  kmeans.setCentroids(2);
+
+  let labels!: number[];
+  for (labels of kmeans);
+
+  console.log(labels);
+  // console.log(kmeans.centroids);
+  console.log(kmeans.transform(datas));
   // step 3, 4에서 SeedZoneObserver 동작
   // try {
-  //   await builder.step1();
-  //   await builder.step2(mailBoxId);
+  // await builder.step1();
+  // await builder.step2(mailBoxId);
   //   console.log(recommender.spotifyToken);
   //   await builder.step3();
   //   await builder.step4();
@@ -24,4 +42,6 @@ const recommender = builder.get();
   // console.log(mail);
   // await recommender.okay();
   // recommender.close();
+
+  await SeedZoneObserver.close();
 })();

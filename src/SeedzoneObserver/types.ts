@@ -1,5 +1,7 @@
+import KMeans from "@kmeans";
+import MinMaxScaler from "@minmaxscaler";
 import { Schema } from "mongoose";
-import SeedZoneModel from "./model";
+import { ClusterZoneModel, SeedZoneModel } from "./model";
 
 export interface ISeedZone {
   [key: string]: string | number | undefined;
@@ -14,6 +16,8 @@ export interface ISeedZone {
   liveness: number;
   valence: number;
   tempo: number;
+
+  label?: number;
 }
 
 export class SeedZone implements ISeedZone {
@@ -29,6 +33,8 @@ export class SeedZone implements ISeedZone {
   liveness: number;
   valence: number;
   tempo: number;
+
+  label?: number;
 
   constructor(seedzone: ISeedZone) {
     this.id = seedzone.id;
@@ -51,5 +57,41 @@ export class SeedZone implements ISeedZone {
 
   static async observing() {
     return await SeedZoneModel.estimatedDocumentCount();
+  }
+}
+
+export interface IClusterZone {
+  _id?: Schema.Types.ObjectId | string;
+  K: number;
+  scaler: {
+    min: number[];
+    max: number[];
+    minMaxSubtract: number[];
+  };
+  centroids: number[][];
+
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export class ClusterZone {
+  static async save(kmeans: KMeans, scaler: MinMaxScaler) {
+    const K = kmeans.K!;
+    const [min, max, minMaxSubtract] = [
+      scaler.min,
+      scaler.max,
+      scaler.minMaxSubtract,
+    ];
+    const centroids = kmeans.centroids!;
+
+    await ClusterZoneModel.create({
+      K,
+      scaler: {
+        min,
+        max,
+        minMaxSubtract,
+      },
+      centroids,
+    });
   }
 }

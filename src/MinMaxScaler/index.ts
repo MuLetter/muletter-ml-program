@@ -28,7 +28,7 @@ class MinMaxScaler {
   }
 
   transfrom(datas?: number[][]) {
-    if (!this.minMaxSubtract) throw new Error("Pleash fit execute.");
+    if (!this.minMaxSubtract) throw new Error("Please fit execute.");
     if (!datas) datas = this.datas;
 
     return _.map(datas, (X) =>

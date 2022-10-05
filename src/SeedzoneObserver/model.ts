@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { ISeedZone } from "./types";
+import { IClusterZone, ISeedZone } from "./types";
 
 const SeedZoneSchema = new Schema<ISeedZone>(
   {
@@ -12,11 +12,31 @@ const SeedZoneSchema = new Schema<ISeedZone>(
     liveness: { type: Number, required: true },
     valence: { type: Number, required: true },
     tempo: { type: Number, required: true },
+    label: { type: Number, required: false },
   },
   {
     collection: "SeedZone",
   }
 );
 
-const SeedZoneModel = model<typeof SeedZoneSchema>("SeedZone", SeedZoneSchema);
-export default SeedZoneModel;
+export const SeedZoneModel = model<typeof SeedZoneSchema>(
+  "SeedZone",
+  SeedZoneSchema
+);
+
+const ClusterZoneSchema = new Schema<IClusterZone>(
+  {
+    K: { type: Number, required: true },
+    scaler: { type: Schema.Types.Mixed, required: true },
+    centroids: [{ type: Schema.Types.Array, required: true }],
+  },
+  {
+    collection: "ClusterZone",
+    timestamps: true,
+  }
+);
+
+export const ClusterZoneModel = model<typeof ClusterZoneSchema>(
+  "ClusterZone",
+  ClusterZoneSchema
+);

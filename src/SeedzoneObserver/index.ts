@@ -29,7 +29,7 @@ export class SeedZoneObserver {
   }
 
   static async init() {
-    const datas = await SeedZoneModel.find({}, { _id: 0, __v: 0 });
+    const datas = await SeedZoneModel.find({}, { _id: 0, __v: 0, label: 0 });
 
     return new SeedZoneObserver(_.map(datas, (data) => data.toObject()));
   }

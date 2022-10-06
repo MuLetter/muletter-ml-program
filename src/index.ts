@@ -5,6 +5,7 @@ import _ from "lodash";
 import MinMaxScaler from "@minmaxscaler";
 import KMeans from "@kmeans";
 import { ClusterZone } from "./SeedzoneObserver/types";
+import { CoordGenerator } from "./CoordGenerator";
 
 const mailBoxId = "633abccf965295f042519aa4";
 const builder = new RecommenderBuilder();
@@ -13,16 +14,18 @@ const recommender = builder.get();
 (async () => {
   await SeedZoneObserver.open();
 
-  const sObs = await SeedZoneObserver.init();
-  console.log(sObs.datas);
+  await CoordGenerator.getCoord(mailBoxId);
 
-  sObs.run();
-  await sObs.save();
+  // const sObs = await SeedZoneObserver.init();
+  // console.log(sObs.datas);
 
-  console.log(sObs.kmeans!.labels);
-  const clusterZone = await ClusterZone.recovery();
+  // sObs.run();
+  // await sObs.save();
 
-  console.log(clusterZone.transform(sObs.processDatas as number[][]));
+  // console.log(sObs.kmeans!.labels);
+  // const clusterZone = await ClusterZone.recovery();
+
+  // console.log(clusterZone.transform(sObs.processDatas as number[][]));
 
   // const datas = scaler.fit().transfrom();
   // const kmeans = new KMeans(datas);

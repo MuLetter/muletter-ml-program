@@ -19,7 +19,8 @@ const recommender = builder.get();
   // sObs.sorting();
   // await sObs.save();
 
-  await CoordGenerator.getCoord(mailBoxId);
+  // await CoordGenerator.getCoord(mailBoxId);
+  await CoordGenerator.allMakeCoord();
 
   // const sObs = await SeedZoneObserver.init();
   // console.log(sObs.datas);

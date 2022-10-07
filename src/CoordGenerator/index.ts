@@ -26,5 +26,15 @@ export class CoordGenerator {
     console.log(countPercentages);
 
     console.log("getCoord", getCoord(countPercentages));
+
+    return getCoord(countPercentages);
+  }
+
+  static async allMakeCoord() {
+    const mailBoxes = await MailBoxModel.find({});
+
+    for (let mailBox of mailBoxes) {
+      console.log(await CoordGenerator.getCoord(mailBox.id));
+    }
   }
 }

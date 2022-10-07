@@ -14,6 +14,11 @@ const recommender = builder.get();
 (async () => {
   await SeedZoneObserver.open();
 
+  // const sObs = await SeedZoneObserver.init();
+  // sObs.run();
+  // sObs.sorting();
+  // await sObs.save();
+
   await CoordGenerator.getCoord(mailBoxId);
 
   // const sObs = await SeedZoneObserver.init();

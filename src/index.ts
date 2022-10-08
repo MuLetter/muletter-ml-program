@@ -4,8 +4,10 @@ import { SeedZoneObserver } from "./SeedzoneObserver";
 import _ from "lodash";
 import MinMaxScaler from "@minmaxscaler";
 import KMeans from "@kmeans";
-import { ClusterZone } from "./SeedzoneObserver/types";
+import { ClusterZone, ISeedZone } from "./SeedzoneObserver/types";
 import { CoordGenerator } from "./CoordGenerator";
+import { SeedZoneModel } from "./SeedzoneObserver/model";
+import fs from "fs";
 
 const mailBoxId = "633abccf965295f042519aa4";
 const builder = new RecommenderBuilder();
@@ -14,15 +16,26 @@ const recommender = builder.get();
 (async () => {
   await SeedZoneObserver.open();
 
-  const sObs = await SeedZoneObserver.init();
+  // const sObs = await SeedZoneObserver.init();
   // await sObs.observing();
 
-  await sObs.run();
-  sObs.sorting();
-  await sObs.save();
+  // await sObs.run();
+  // sObs.sorting();
+  // await sObs.save();
 
-  // await CoordGenerator.getCoord(mailBoxId);
-  await CoordGenerator.allMakeCoord();
+  // // await CoordGenerator.getCoord(mailBoxId);
+  // await CoordGenerator.allMakeCoord();
+
+  // const seedZones = await SeedZoneModel.find({}, { _id: 0, __v: 0, label: 0 });
+  // const seedZoneJson = JSON.stringify(seedZones);
+
+  // fs.writeFileSync("./test.json", seedZoneJson);
+  const seedZoneJson = fs.readFileSync("./test.json", {
+    encoding: "utf8",
+    flag: "r",
+  });
+  const seedZones = JSON.parse(seedZoneJson) as ISeedZone[];
+  console.log(seedZones);
 
   // const sObs = await SeedZoneObserver.init();
   // console.log(sObs.datas);

@@ -41,15 +41,15 @@ export function checkQuadrant(angle: number, distance: number) {
 export function getCoord(datas: number[]) {
   const length = datas.length;
   const angles = _.map(_.range(0, length), (x) => (x / length) * (2 * Math.PI));
-  console.log(angles);
+  // console.log(angles);
 
   // get non-zero
   const X = _.filter(angles, (a, idx) => datas[idx] !== 0);
   const Y = _.filter(datas, (d) => d !== 0);
-  console.log(X, Y);
+  // console.log(X, Y);
 
   const points = _.zip(X, Y);
-  console.log(points);
+  // console.log(points);
 
   const _points = _.map(points, ([x, y]) => {
     const radian: number = x!;
@@ -72,7 +72,7 @@ export function getCoord(datas: number[]) {
       ];
     }
   });
-  console.log(_points);
+  // console.log(_points);
 
   const unZipDatas = _.unzip(_points as number[][]);
   return _.map(unZipDatas, _.sum);

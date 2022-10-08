@@ -4,6 +4,11 @@ import { MailBoxModel } from ".";
 import { Track } from "../types";
 import _ from "lodash";
 
+export type Point = {
+  x: number;
+  y: number;
+};
+
 export type IMailBox = {
   _id?: Schema.Types.ObjectId | string;
 
@@ -11,6 +16,7 @@ export type IMailBox = {
   description: string;
   imagePath?: string;
   tracks: Track[];
+  point?: Point;
 
   createdAt?: Date;
   updatedAt?: Date;
@@ -23,6 +29,7 @@ export class MailBox implements IMailBox {
   description: string;
   imagePath?: string;
   tracks: Track[];
+  point?: Point;
 
   // mailCount : number
 

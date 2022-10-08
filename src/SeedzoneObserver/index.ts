@@ -1,5 +1,5 @@
 import { dbConnect, dbDisconnect } from "@recommender/models/connect";
-import { SeedZoneModel } from "./model";
+import { ClusterZoneModel, SeedZoneModel } from "./model";
 import { ClusterZone, ISeedZone, SeedZone } from "./types";
 import _ from "lodash";
 import MinMaxScaler from "@minmaxscaler";
@@ -44,7 +44,8 @@ export class SeedZoneObserver {
     return _.map(this.datas, (data) => _.tail(_.values(data)));
   }
 
-  run() {
+  async run() {
+    console.log("kmeans run");
     const scaler = new MinMaxScaler(this.processDatas as number[][]);
     const datas = scaler.fit().transfrom();
 
@@ -56,9 +57,13 @@ export class SeedZoneObserver {
 
     this.scaler = scaler;
     this.kmeans = kmeans;
+
+    this.sorting();
+    await ClusterZone.save(this.kmeans!, this.scaler!);
   }
 
   sorting() {
+    console.log("sorting");
     const labels = _.range(0, this.kmeans!.K);
     const centroids = this.kmeans!.centroids;
 
@@ -127,9 +132,33 @@ export class SeedZoneObserver {
     this.kmeans!.centroids = kmeansInjectedCentroids;
   }
 
-  async save() {
-    const zipDatas = _.zip(this.processIds, this.kmeans!.labels!);
+  async observing() {
+    const count = await SeedZoneModel.estimatedDocumentCount();
+    const clusterZone = await ClusterZoneModel.find(
+      {},
+      {},
+      { sort: { createdAt: -1 } }
+    );
 
+    const K = clusterZone[0].K;
+    const chkK = Math.round(Math.sqrt(count / 2));
+
+    console.log(K, chkK);
+    if (K < chkK) {
+      console.log("seedzone observer run");
+      const sObs = await SeedZoneObserver.init();
+      await sObs.run();
+      await sObs.save();
+    }
+  }
+
+  async save() {
+    console.log("SeedZone Label Save");
+    const sObs = await SeedZoneObserver.init();
+    const clusterZone = await ClusterZone.recovery();
+
+    const labels = clusterZone.transform(sObs.processDatas as number[][]);
+    const zipDatas = _.zip(sObs.processIds, labels);
     for (let [id, label] of zipDatas)
       await SeedZoneModel.updateOne(
         { id },
@@ -139,7 +168,5 @@ export class SeedZoneObserver {
           },
         }
       );
-
-    await ClusterZone.save(this.kmeans!, this.scaler!);
   }
 }

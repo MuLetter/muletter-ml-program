@@ -7,6 +7,7 @@ const MailBoxSchema = new Schema<IMailBox>(
     description: { type: String, required: true },
     imagePath: { type: String, required: false },
     tracks: [{ type: Schema.Types.Mixed, required: false }],
+    point: { type: Schema.Types.Mixed, required: false },
   },
   {
     collection: "MailBox",

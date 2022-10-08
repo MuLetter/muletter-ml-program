@@ -23,18 +23,27 @@ export class CoordGenerator {
     );
     const labelCounts = _.countBy(seedCheck, ({ label }) => label);
     const countPercentages = getCountPercentage(K, labelCounts);
-    console.log(countPercentages);
+    // console.log(countPercentages);
 
-    console.log("getCoord", getCoord(countPercentages));
+    // console.log("getCoord", getCoord(countPercentages));
+    const [x, y] = getCoord(countPercentages);
 
-    return getCoord(countPercentages);
+    await MailBoxModel.updateOne(
+      { _id: mailBoxId },
+      {
+        $set: {
+          point: {
+            x,
+            y,
+          },
+        },
+      }
+    );
   }
 
   static async allMakeCoord() {
     const mailBoxes = await MailBoxModel.find({});
 
-    for (let mailBox of mailBoxes) {
-      console.log(await CoordGenerator.getCoord(mailBox.id));
-    }
+    for (let mailBox of mailBoxes) await CoordGenerator.getCoord(mailBox.id);
   }
 }

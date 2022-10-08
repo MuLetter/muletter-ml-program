@@ -8,6 +8,7 @@ import { ClusterZone, ISeedZone } from "./SeedzoneObserver/types";
 import { CoordGenerator } from "./CoordGenerator";
 import { SeedZoneModel } from "./SeedzoneObserver/model";
 import fs from "fs";
+import axios from "axios";
 
 const mailBoxId = "633abccf965295f042519aa4";
 const builder = new RecommenderBuilder();
@@ -35,7 +36,12 @@ const recommender = builder.get();
     flag: "r",
   });
   const seedZones = JSON.parse(seedZoneJson) as ISeedZone[];
-  console.log(seedZones);
+
+  for (let seedZone of seedZones) {
+    await axios.post("http://localhost:8080/test/seedzone", [seedZone]);
+
+    setTimeout(() => {}, 2000);
+  }
 
   // const sObs = await SeedZoneObserver.init();
   // console.log(sObs.datas);
